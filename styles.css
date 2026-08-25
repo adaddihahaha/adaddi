@@ -1,5 +1,7 @@
 /* Consolidated styles for Solar Savings site */
 :root{--bg:#0f1923;--card:#1e222d;--muted:#787b86;--accent:#f7931a;--accent-2:#0b6}
+/* Link colors derived from --accent */
+:root{--link:hsl(33 85% 68%);--link-hover:var(--accent)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#d3d6dc;line-height:1.5;min-height:100vh;padding:36px}
 .container{max-width:980px;margin:0 auto}
@@ -9,10 +11,12 @@ header, .site-header{display:flex;align-items:center;justify-content:space-betwe
 /* When using an image file for the logo */
 .logo img, .site-logo img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
 h1, .site-title{font-size:1.25rem;color:var(--accent);letter-spacing:0.2px}
+h2 {font-size:1.2rem;}
 .site-title{font-size:1.1rem}
 nav, .site-nav{display:flex;gap:12px}
-nav a, .site-nav a{color:#cfe5ff;text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600}
-nav a:hover, .site-nav a:hover{background:#0b2230}
+nav a, .site-nav a, a, a.small-link, a.contact{color:var(--link);text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600}
+a {padding: 0;}
+nav a:hover, .site-nav a:hover, a:hover, a.small-link:hover, a.contact:hover{background:#0b2230;color:var(--link-hover)}
 .hero{background:var(--card);padding:22px;border-radius:12px;border:1px solid #2a2e39;margin-bottom:18px}
 .hero p{color:#bfc4cb;margin-top:8px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:18px}
