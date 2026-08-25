@@ -6,6 +6,8 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;backgro
 header, .site-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
 .brand, .site-brand{display:flex;align-items:center;gap:12px}
 .logo, .site-logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#26a69a);display:flex;align-items:center;justify-content:center;font-weight:700;color:#111}
+/* When using an image file for the logo */
+.logo img, .site-logo img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
 h1, .site-title{font-size:1.25rem;color:var(--accent);letter-spacing:0.2px}
 .site-title{font-size:1.1rem}
 nav, .site-nav{display:flex;gap:12px}
