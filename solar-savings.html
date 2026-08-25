@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Power Savings Tracker</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f1923;
+            color: #d1d4dc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 920px; width: 100%; }
+
+        h1 { text-align: center; color: #f7931a; font-size: 1.6rem; margin-bottom: 6px; }
+        .subtitle { text-align: center; color: #787b86; font-size: 0.85rem; margin-bottom: 30px; }
+
+        .card {
+            background: #1e222d;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2e39;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #d1d4dc;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2e39;
+        }
+
+        /* Static info */
+        .static-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+        }
+
+        .static-box {
+            background: #131722;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #2a2e39;
+        }
+
+        .static-box .sb-label {
+            font-size: 0.7rem;
+            color: #787b86;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .static-box .sb-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .static-box .sb-sub {
+            font-size: 0.68rem;
+            color: #4a4e59;
+            margin-top: 4px;
+        }
+
+        .static-box input[type="number"] {
+            background: transparent;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 4px 8px;
+            border-color: transparent;
+        }
+        .static-box input[type="number"]:hover { border-color: #2a2e39; }
+        .static-box input[type="number"]:focus { border-color: #f7931a; }
+        .static-box input[type="number"]:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Summary boxes */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .summary-box {
+            background: #131722;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            border: 1px solid #2a2e39;
+        }
+
+        .summary-box .s-label {
+            font-size: 0.72rem;
+            color: #787b86;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .summary-box .s-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .summary-box .s-sub {
+            font-size: 0.7rem;
+            color: #4a4e59;
+            margin-top: 4px;
+        }
+
+        .green { color: #26a69a; } .red { color: #ef5350; }
+        .orange { color: #f7931a; } .blue { color: #2962ff; }
+        .yellow { color: #ff9800; }
+
+        .highlight-green { border-color: #26a69a; }
+        .highlight-red { border-color: #ef5350; }
+        .highlight-orange { border-color: #f7931a; }
+        .highlight-blue { border-color: #2962ff; }
+        .highlight-yellow { border-color: #ff9800; }
+
+        /* Form */
+        .helptext { font-size: 0.75rem; color: #787b86; margin-bottom: 6px; line-height: 1.4; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            background: #131722;
+            border: 1px solid #2a2e39;
+            border-radius: 8px;
+            color: #d1d4dc;
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: #f7931a; }
+        input::placeholder { color: #4a4e59; }
+
+        /* Year sections */
+        .year-header {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #f7931a;
+            margin: 20px 0 10px;
+            padding: 8px 0;
+            border-bottom: 2px solid #f7931a33;
+        }
+
+        .year-header:first-of-type { margin-top: 8px; }
+
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #363a45;
+            color: #787b86;
+            font-size: 0.55rem;
+            font-weight: 700;
+            cursor: help;
+            position: relative;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        .tooltip-icon:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 130%;
+            right: -10px;
+            background: #1e222d;
+            color: #d1d4dc;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 400;
+            white-space: normal;
+            width: 250px;
+            border: 1px solid #f7931a44;
+            z-index: 100;
+            text-transform: none;
+            letter-spacing: 0;
+            line-height: 1.5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .month-grid-group-header {
+            display: grid;
+            grid-template-columns: 130px repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+
+        .month-grid-group-header span {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .month-grid-header {
+            display: grid;
+            grid-template-columns: 130px repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #2a2e39;
+        }
+
+        .month-grid-header span {
+            font-size: 0.65rem;
+            color: #787b86;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .month-row {
+            display: grid;
+            grid-template-columns: 130px repeat(6, 1fr);
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .month-row .month-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #d1d4dc;
+        }
+
+        .month-row .month-label .yr { color: #787b86; font-weight: 400; font-size: 0.75rem; }
+
+        /* Table */
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        th, td {
+            padding: 9px 10px;
+            border-bottom: 1px solid #2a2e39;
+            white-space: nowrap;
+        }
+
+        th {
+            color: #787b86;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        th:first-child { text-align: left; }
+        td { text-align: center; }
+        td:first-child { text-align: left; font-weight: 600; }
+
+        tr:hover td { background: #131722; }
+
+        .positive { color: #ef5350; font-weight: 600; }
+        .negative { color: #26a69a; font-weight: 600; }
+        .savings-cell { color: #26a69a; font-weight: 700; }
+        .loss-cell { color: #ef5350; font-weight: 700; }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: #f7931a; color: #fff; width: 100%; margin-top: 14px; }
+        .btn-primary:hover { background: #e0830f; }
+
+        .btn-clear {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid #363a45;
+            border-radius: 8px;
+            color: #787b86;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-clear:hover { border-color: #ef5350; color: #ef5350; }
+        .btn:disabled, .btn-clear:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Bar chart */
+        .bar-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 20px;
+            background: #131722;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+            min-width: 40px;
+        }
+
+        .bar-fill.bar-before { background: #ef5350; }
+        .bar-fill.bar-projected { background: #ff9800; }
+        .bar-fill.bar-after { background: #26a69a; }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 0.75rem;
+        }
+
+        .chart-legend span { display: flex; align-items: center; gap: 6px; }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Payback */
+        .payback-bar-track {
+            width: 100%;
+            height: 28px;
+            background: #131722;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2a2e39;
+        }
+
+        .payback-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f7931a, #26a69a);
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #fff;
+            min-width: 50px;
+        }
+
+        .payback-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: #787b86;
+            margin-top: 6px;
+        }
+
+        /* Verdict */
+        .verdict-box {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .verdict-box.positive-verdict {
+            background: rgba(38, 166, 154, 0.15);
+            color: #26a69a;
+            border: 1px solid #26a69a;
+        }
+
+        .verdict-box.negative-verdict {
+            background: rgba(239, 83, 80, 0.15);
+            color: #ef5350;
+            border: 1px solid #ef5350;
+        }
+
+        .verdict-box.neutral-verdict {
+            background: rgba(255, 152, 0, 0.15);
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        .hidden { display: none; }
+
+        /* CSV status */
+        .file-status {
+            font-size: 0.78rem;
+            color: #26a69a;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .file-status.disconnected { color: #787b86; }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-file {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-open { background: #2962ff; color: #fff; }
+        .btn-open:hover { background: #1e53e5; }
+
+        .btn-create {
+            background: transparent;
+            border: 1px solid #363a45;
+            color: #787b86;
+        }
+
+        .btn-create:hover { border-color: #26a69a; color: #26a69a; }
+
+        .save-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #26a69a;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .save-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .note-text {
+            font-size: 0.72rem;
+            color: #4a4e59;
+            margin-top: 16px;
+            line-height: 1.6;
+            padding-top: 12px;
+            border-top: 1px solid #2a2e39;
+        }
+
+        .note-text strong { color: #787b86; }
+
+        /* History table */
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .history-table th, .history-table td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #2a2e39; white-space: nowrap; }
+        .history-table th { color: #787b86; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; }
+        .history-table th:first-child, .history-table td:first-child { text-align: left; }
+        .history-table tr:hover td { background: #131722; }
+
+        .btn-delete-row {
+            background: none;
+            border: none;
+            color: #4a4e59;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 2px 6px;
+        }
+
+        .btn-delete-row:hover { color: #ef5350; }
+
+        .no-history {
+            text-align: center;
+            color: #4a4e59;
+            padding: 20px;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .summary-grid { grid-template-columns: 1fr 1fr; }
+            .static-grid { grid-template-columns: 1fr 1fr; }
+            .month-row { grid-template-columns: 80px repeat(6, 1fr); gap: 3px; }
+            .month-grid-header, .month-grid-group-header { grid-template-columns: 80px repeat(6, 1fr); gap: 3px; }
+            .month-row .month-label { font-size: 0.7rem; }
+            input[type="number"] { padding: 6px 4px; font-size: 0.78rem; }
+            .tooltip-icon:hover::after { right: -5px; width: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>&#9728; Solar Power Savings Tracker</h1>
+        <p class="subtitle">Compare electricity bills before &amp; after solar — see how much you're saving!</p>
+
+        <!-- CSV File Connection -->
+        <div class="card">
+            <div class="card-title">CSV File (Auto-Save)</div>
+            <p class="helptext" style="margin-bottom:12px;">Connect a CSV file. Every time you calculate, results are automatically saved.</p>
+            <div class="file-status disconnected" id="fileStatus">No file connected</div>
+            <div class="file-actions">
+                <button class="btn-file btn-open" onclick="openCSVFile()">Open solar-savings.csv</button>
+                <button class="btn-file btn-create" onclick="createCSVFile()">Create New File</button>
+            </div>
+        </div>
+
+        <!-- Solar Power System Details (Editable) -->
+        <div class="card">
+            <div class="card-title">Solar Power System Details</div>
+            <div class="static-grid">
+                <div class="static-box highlight-orange">
+                    <div class="sb-label">System Cost</div>
+                    <input type="number" id="systemCost" value="0" class="orange" oninput="updateSystemDisplay()" disabled>
+                    <div class="sb-sub">total installation cost</div>
+                </div>
+                <div class="static-box highlight-blue">
+                    <div class="sb-label">Monthly Loan</div>
+                    <input type="number" id="monthlyLoan" value="0" class="blue" oninput="updateSystemDisplay()" disabled>
+                    <div class="sb-sub">bank amortization</div>
+                </div>
+                <div class="static-box highlight-red">
+                    <div class="sb-label">Total Months</div>
+                    <input type="number" id="totalMonths" value="0" class="red" oninput="updateSystemDisplay()" disabled>
+                    <div class="sb-sub">loan duration</div>
+                </div>
+                <div class="static-box highlight-yellow">
+                    <div class="sb-label">Total Mortgage</div>
+                    <div class="sb-value yellow" id="totalMortgageDisplay">&#8369;0.00</div>
+                    <div class="sb-sub" id="interestDisplay">Interest: &#8369;0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Bills -->
+        <div class="card">
+            <div class="card-title">Monthly Electricity Bills</div>
+            <p class="helptext" style="margin-bottom:10px;">
+                Enter <strong>kWh</strong> at <strong>&#8369;/kWh</strong> per month.
+                Ang <strong style="color:#ff9800;">No Solar</strong> ay expected consumption at presyo kung WALANG solar &mdash; gamitin ang Before Solar kWh as base, tapos dagdagan depende sa usage.
+            </p>
+
+            <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap;" id="generateRow">
+                <div id="startMonthDiv" style="flex:0 0 auto;">
+                    <label style="font-size:0.7rem;color:#787b86;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Month Start</label>
+                    <select id="startMonthSelect" style="padding:8px 10px;background:#131722;border:1px solid #2a2e39;border-radius:8px;color:#d1d4dc;font-size:0.88rem;outline:none;" disabled></select>
+                </div>
+                <div id="startYearDiv" style="flex:0 0 auto;">
+                    <label style="font-size:0.7rem;color:#787b86;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">Year Start</label>
+                    <input type="number" id="startYearInput" style="width:90px;" disabled>
+                </div>
+                <button class="btn btn-primary" id="btnGenerate" onclick="generateMonthFields()" style="flex:1;margin-top:0;min-width:180px;" disabled>Generate Monthly Fields</button>
+            </div>
+            <div id="monthRows"></div>
+            <button class="btn btn-primary" id="btnCalculate" onclick="calculateSavings()" style="display:none;">Calculate &amp; Save to CSV</button>
+            <button class="btn-clear" id="btnClear" onclick="clearAll()" style="display:none;">Clear All</button>
+        </div>
+
+        <!-- Results -->
+        <div class="card hidden" id="resultsCard">
+            <div class="card-title">Savings Summary</div>
+            <div class="summary-grid" id="summaryGrid"></div>
+
+            <div class="card-title" style="margin-top:10px;">Monthly Comparison</div>
+            <div class="chart-legend">
+                <span><span class="legend-dot" style="background:#ef5350;"></span> Before Solar (Old Price)</span>
+                <span><span class="legend-dot" style="background:#ff9800;"></span> Est. Without Solar</span>
+                <span><span class="legend-dot" style="background:#26a69a;"></span> After Solar</span>
+            </div>
+            <div id="barChart"></div>
+
+            <div class="card-title" style="margin-top:24px;">Month-by-Month Breakdown</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Before Solar</th>
+                            <th>Est. No Solar</th>
+                            <th>After Solar</th>
+                            <th>Savings</th>
+                            <th>% Saved</th>
+                            <th>vs Loan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                    <tfoot id="resultsFoot"></tfoot>
+                </table>
+            </div>
+
+            <div class="card-title" style="margin-top:24px;">Payback Progress</div>
+            <div id="paybackSection"></div>
+
+            <div id="verdictBox"></div>
+
+            <div class="note-text">
+                <strong>Formulas used:</strong><br>
+                Before Solar = kWh &times; &#8369;/kWh (old bill before solar)<br>
+                After Solar = kWh &times; &#8369;/kWh (actual bill with solar)<br>
+                <strong style="color:#ff9800;">Est. Without Solar</strong> = No Solar kWh &times; &#8369;/kWh &mdash; projected bill kung walang solar sa bagong presyo at consumption<br>
+                Savings = Est. Without Solar &minus; After Solar<br>
+                % Saved = (Savings &divide; Est. Without Solar) &times; 100<br>
+                Net Savings = Savings &minus; Monthly Loan Payment<br>
+                Total Mortgage = Monthly Loan &times; Total Months
+            </div>
+        </div>
+
+        <!-- History from CSV -->
+        <div class="card">
+            <div class="card-title">Saved Calculations (from CSV)</div>
+            <div class="table-wrap" id="historyTableWrap">
+                <div class="no-history">Open or create a CSV file to see saved calculations.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="save-toast" id="saveToast">Saved to CSV!</div>
+
+    <script>
+        // --- System Values (Dynamic) ---
+
+        function getSystemValues() {
+            const systemCost = parseFloat(document.getElementById('systemCost').value) || 0;
+            const monthlyLoan = parseFloat(document.getElementById('monthlyLoan').value) || 0;
+            const totalMonths = parseInt(document.getElementById('totalMonths').value) || 0;
+            const totalMortgage = monthlyLoan * totalMonths;
+            const interestPaid = totalMortgage - systemCost;
+            return { systemCost, monthlyLoan, totalMonths, totalMortgage, interestPaid };
+        }
+
+        function updateSystemDisplay() {
+            const sys = getSystemValues();
+            const el = document.getElementById('totalMortgageDisplay');
+            const sub = document.getElementById('interestDisplay');
+            if (el) el.textContent = formatPeso(sys.totalMortgage);
+            if (sub) sub.textContent = 'Interest: ' + (sys.interestPaid >= 0 ? '' : '-') + formatPeso(sys.interestPaid);
+        }
+
+        const MONTH_NAMES = [
+            'January','February','March','April','May','June',
+            'July','August','September','October','November','December'
+        ];
+        const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        let months = [];
+
+        // Populate month dropdown and default year
+        function initStartFields() {
+            const sel = document.getElementById('startMonthSelect');
+            MONTH_NAMES.forEach((name, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = name;
+                sel.appendChild(opt);
+            });
+            sel.value = new Date().getMonth();
+            document.getElementById('startYearInput').value = new Date().getFullYear();
+        }
+        initStartFields();
+
+        function generateMonthFields(overrideStart) {
+            const sys = getSystemValues();
+            const totalMonths = sys.totalMonths;
+            if (totalMonths <= 0 || totalMonths > 120) {
+                alert('Please enter a valid Total Months (1–120).');
+                return;
+            }
+
+            let sm, sy;
+            if (overrideStart) {
+                sm = overrideStart.month;
+                sy = overrideStart.year;
+            } else {
+                sm = parseInt(document.getElementById('startMonthSelect').value);
+                sy = parseInt(document.getElementById('startYearInput').value);
+            }
+            // Sync the UI fields
+            document.getElementById('startMonthSelect').value = sm;
+            document.getElementById('startYearInput').value = sy;
+
+            months = [];
+            for (let i = 0; i < totalMonths; i++) {
+                const mi = (sm + i) % 12;
+                const beforeYear = sy + Math.floor((sm + i) / 12);
+                const afterYear = beforeYear + 1;
+                months.push({
+                    index: i,
+                    monthIndex: mi,
+                    name: MONTH_NAMES[mi],
+                    short: MONTH_SHORT[mi],
+                    beforeYear,
+                    afterYear,
+                    label: `${MONTH_SHORT[mi]} ${beforeYear} → ${afterYear}`,
+                    yearGroup: `Year ${Math.floor(i / 12) + 1}`
+                });
+            }
+
+            init();
+            document.getElementById('btnCalculate').style.display = '';
+            document.getElementById('btnClear').style.display = '';
+            document.getElementById('btnGenerate').style.display = 'none';
+            document.getElementById('startMonthDiv').style.display = 'none';
+            document.getElementById('startYearDiv').style.display = 'none';
+        }
+
+        function enableSystem() {
+            document.getElementById('systemCost').disabled = false;
+            document.getElementById('monthlyLoan').disabled = false;
+            document.getElementById('totalMonths').disabled = false;
+            document.getElementById('btnGenerate').disabled = false;
+            document.getElementById('startMonthSelect').disabled = false;
+            document.getElementById('startYearInput').disabled = false;
+        }
+
+        // --- CSV File Handle ---
+        let fileHandle = null;
+        let historyData = [];
+
+        const CSV_HEADERS = [
+            'Calc Date','Saved Cal ID','Month','Before Year','After Year',
+            'Before kWh','Before P/kWh','Before Solar',
+            'After kWh','After P/kWh','After Solar',
+            'NoSolar kWh','NoSolar P/kWh','Est No Solar',
+            'Savings','% Saved','Net vs Loan',
+            'System Cost','Monthly Loan','Total Months','Total Mortgage'
+        ];
+
+        function updateFileStatus() {
+            const el = document.getElementById('fileStatus');
+            if (fileHandle) {
+                el.textContent = '● Connected to: ' + fileHandle.name;
+                el.className = 'file-status';
+            } else {
+                el.textContent = 'No file connected';
+                el.className = 'file-status disconnected';
+            }
+        }
+
+        function csvRowToArray(row) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < row.length; i++) {
+                const ch = row[i];
+                if (inQuotes) {
+                    if (ch === '"' && row[i+1] === '"') { current += '"'; i++; }
+                    else if (ch === '"') { inQuotes = false; }
+                    else { current += ch; }
+                } else {
+                    if (ch === '"') { inQuotes = true; }
+                    else if (ch === ',') { result.push(current.trim()); current = ''; }
+                    else { current += ch; }
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(l => l.trim());
+            if (lines.length <= 1) return [];
+            return lines.slice(1).map(line => {
+                const c = csvRowToArray(line);
+                return {
+                    calcDate: c[0]||'', savedCalId: c[1]||'', month: c[2]||'', beforeYear: c[3]||'', afterYear: c[4]||'',
+                    bkwh: c[5]||'', bpkwh: c[6]||'', before: c[7]||'',
+                    akwh: c[8]||'', apkwh: c[9]||'', after: c[10]||'',
+                    nskwh: c[11]||'', nspkwh: c[12]||'', projected: c[13]||'',
+                    savings: c[14]||'', pctSaved: c[15]||'', netVsLoan: c[16]||'',
+                    sysCost: c[17]||'', sysLoan: c[18]||'', sysMonths: c[19]||'', sysMortgage: c[20]||''
+                };
+            });
+        }
+
+        function historyToCSV(data) {
+            let csv = CSV_HEADERS.join(',') + '\n';
+            data.forEach(r => {
+                const row = [
+                    r.calcDate, r.savedCalId||'', r.month, r.beforeYear, r.afterYear,
+                    r.bkwh||'', r.bpkwh||'', r.before,
+                    r.akwh||'', r.apkwh||'', r.after,
+                    r.nskwh||'', r.nspkwh||'', r.projected||'',
+                    r.savings, r.pctSaved||'', r.netVsLoan,
+                    r.sysCost||'', r.sysLoan||'', r.sysMonths||'', r.sysMortgage||''
+                ];
+                csv += row.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',') + '\n';
+            });
+            return csv;
+        }
+
+        async function writeToFile() {
+            if (!fileHandle) return;
+            const csv = historyToCSV(historyData);
+            const writable = await fileHandle.createWritable();
+            await writable.write(csv);
+            await writable.close();
+        }
+
+        async function readFromFile() {
+            if (!fileHandle) return;
+            const file = await fileHandle.getFile();
+            const text = await file.text();
+            historyData = parseCSV(text);
+            if (historyData.length > 0) {
+                const latest = historyData[0];
+                if (latest.sysCost) document.getElementById('systemCost').value = latest.sysCost;
+                if (latest.sysLoan) document.getElementById('monthlyLoan').value = latest.sysLoan;
+                if (latest.sysMonths) document.getElementById('totalMonths').value = latest.sysMonths;
+                updateSystemDisplay();
+
+                // Restore monthly fields from latest saved batch
+                const latestDate = latest.calcDate;
+                const latestRows = historyData.filter(r => r.calcDate === latestDate);
+                const firstMi = MONTH_SHORT.indexOf(latestRows[0].month);
+                const firstYr = parseInt(latestRows[0].beforeYear);
+
+                if (firstMi >= 0 && !isNaN(firstYr)) {
+                    generateMonthFields({ month: firstMi, year: firstYr });
+                    latestRows.forEach(r => {
+                        let idx;
+                        if (r.savedCalId && r.savedCalId.length === 4) {
+                            const miy = parseInt(r.savedCalId.substring(0,2));
+                            const yg = parseInt(r.savedCalId.substring(2,4));
+                            idx = (yg - 1) * 12 + (miy - 1);
+                        } else {
+                            idx = r.savedCalId;
+                        }
+                        if (idx !== '' && document.getElementById(`bkwh-${idx}`)) {
+                            if (r.bkwh) document.getElementById(`bkwh-${idx}`).value = r.bkwh;
+                            if (r.bpkwh) document.getElementById(`bpkwh-${idx}`).value = r.bpkwh;
+                            if (r.akwh) document.getElementById(`akwh-${idx}`).value = r.akwh;
+                            if (r.apkwh) document.getElementById(`apkwh-${idx}`).value = r.apkwh;
+                            if (r.nskwh) document.getElementById(`nskwh-${idx}`).value = r.nskwh;
+                            if (r.nspkwh) document.getElementById(`nspkwh-${idx}`).value = r.nspkwh;
+                        }
+                    });
+                }
+            }
+            renderHistory();
+        }
+
+        async function openCSVFile() {
+            try {
+                const [handle] = await window.showOpenFilePicker({
+                    types: [{ description: 'CSV Files', accept: { 'text/csv': ['.csv'] } }],
+                    multiple: false
+                });
+                fileHandle = handle;
+                updateFileStatus();
+                enableSystem();
+                await readFromFile();
+            } catch (e) {
+                if (e.name !== 'AbortError') alert('Could not open file: ' + e.message);
+            }
+        }
+
+        async function createCSVFile() {
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: 'solar-savings.csv',
+                    types: [{ description: 'CSV Files', accept: { 'text/csv': ['.csv'] } }]
+                });
+                fileHandle = handle;
+                historyData = [];
+                await writeToFile();
+                updateFileStatus();
+                enableSystem();
+                renderHistory();
+            } catch (e) {
+                if (e.name !== 'AbortError') alert('Could not create file: ' + e.message);
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('saveToast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function renderHistory() {
+            const wrap = document.getElementById('historyTableWrap');
+
+            if (!fileHandle) {
+                wrap.innerHTML = '<div class="no-history">Open or create a CSV file to see saved calculations.</div>';
+                return;
+            }
+
+            if (historyData.length === 0) {
+                wrap.innerHTML = '<div class="no-history">No saved calculations yet. Calculate to start saving.</div>';
+                return;
+            }
+
+            // Group by calc date
+            const grouped = {};
+            historyData.forEach((r, i) => {
+                if (!grouped[r.calcDate]) grouped[r.calcDate] = [];
+                grouped[r.calcDate].push({ ...r, idx: i });
+            });
+
+            let html = '';
+            Object.keys(grouped).reverse().forEach(date => {
+                const rows = grouped[date];
+                html += `<div style="margin-bottom:16px;">`;
+                html += `<div style="font-size:0.8rem;font-weight:700;color:#f7931a;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                    <span>Saved on ${date}</span>
+                    <button class="btn-delete-row" title="Delete this batch" onclick="deleteBatch('${date}')">&times; Delete</button>
+                </div>`;
+                html += `<table class="history-table"><thead><tr>
+                    <th>Month</th><th>Before</th><th>After</th><th>Est.</th><th>Savings</th><th>vs Loan</th>
+                </tr></thead><tbody>`;
+                rows.forEach(r => {
+                    const savCls = parseFloat(r.savings) > 0 ? 'savings-cell' : parseFloat(r.savings) < 0 ? 'loss-cell' : '';
+                    const netCls = parseFloat(r.netVsLoan) > 0 ? 'savings-cell' : parseFloat(r.netVsLoan) < 0 ? 'loss-cell' : '';
+                    html += `<tr>
+                        <td>${r.month} '${r.beforeYear.slice(-2)}→'${r.afterYear.slice(-2)}</td>
+                        <td>₱${r.before}</td>
+                        <td>₱${r.after}</td>
+                        <td style="color:#ff9800;">₱${r.projected || '—'}</td>
+                        <td class="${savCls}">₱${r.savings}</td>
+                        <td class="${netCls}">₱${r.netVsLoan}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table></div>';
+            });
+
+            wrap.innerHTML = html;
+        }
+
+        async function deleteBatch(date) {
+            historyData = historyData.filter(r => r.calcDate !== date);
+            await writeToFile();
+            renderHistory();
+        }
+
+        // --- Build month input rows ---
+        function init() {
+            const container = document.getElementById('monthRows');
+            let html = '';
+            let currentGroup = '';
+
+            months.forEach(m => {
+                if (m.yearGroup !== currentGroup) {
+                    currentGroup = m.yearGroup;
+                    html += `<div class="year-header">${currentGroup}</div>`;
+                    html += `<div class="month-grid-group-header">
+                        <span></span>
+                        <span style="grid-column:span 2;color:#ef5350;">Before Solar</span>
+                        <span style="grid-column:span 2;color:#26a69a;">After Solar</span>
+                        <span style="grid-column:span 2;color:#ff9800;">No Solar <span class="tooltip-icon" data-tip="Expected consumption kung WALANG solar. Gamitin ang Before Solar kWh as base, tapos dagdagan ng extra kWh depende sa usage. Ang ₱/kWh ay current na presyo ng kuryente. Bill = kWh × ₱/kWh.">?</span></span>
+                    </div>
+                    <div class="month-grid-header">
+                        <span>Month</span>
+                        <span>kWh</span><span>₱/kWh</span>
+                        <span>kWh</span><span>₱/kWh</span>
+                        <span>kWh</span><span>₱/kWh</span>
+                    </div>`;
+                }
+
+                html += `<div class="month-row">
+                    <div class="month-label">${m.name} <span class="yr">'${String(m.beforeYear).slice(-2)} → '${String(m.afterYear).slice(-2)}</span></div>
+                    <input type="number" id="bkwh-${m.index}" step="any" placeholder="kWh">
+                    <input type="number" id="bpkwh-${m.index}" step="any" placeholder="₱/kWh">
+                    <input type="number" id="akwh-${m.index}" step="any" placeholder="kWh">
+                    <input type="number" id="apkwh-${m.index}" step="any" placeholder="₱/kWh">
+                    <input type="number" id="nskwh-${m.index}" step="any" placeholder="kWh">
+                    <input type="number" id="nspkwh-${m.index}" step="any" placeholder="₱/kWh">
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function clearAll() {
+            months.forEach(m => {
+                document.getElementById(`bkwh-${m.index}`).value = '';
+                document.getElementById(`bpkwh-${m.index}`).value = '';
+                document.getElementById(`akwh-${m.index}`).value = '';
+                document.getElementById(`apkwh-${m.index}`).value = '';
+                document.getElementById(`nskwh-${m.index}`).value = '';
+                document.getElementById(`nspkwh-${m.index}`).value = '';
+            });
+            document.getElementById('resultsCard').classList.add('hidden');
+        }
+
+        function formatPeso(n) {
+            return '₱' + Math.abs(n).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        async function calculateSavings() {
+            const sys = getSystemValues();
+            const rows = [];
+            let totalBefore = 0, totalAfter = 0, totalProjected = 0, totalSavings = 0;
+            let monthsWithData = 0;
+
+            months.forEach(m => {
+                const bkwh = parseFloat(document.getElementById(`bkwh-${m.index}`).value);
+                const bpkwh = parseFloat(document.getElementById(`bpkwh-${m.index}`).value);
+                const akwh = parseFloat(document.getElementById(`akwh-${m.index}`).value);
+                const apkwh = parseFloat(document.getElementById(`apkwh-${m.index}`).value);
+                const nskwh = parseFloat(document.getElementById(`nskwh-${m.index}`).value);
+                const nspkwh = parseFloat(document.getElementById(`nspkwh-${m.index}`).value);
+
+                if (!isNaN(bkwh) && !isNaN(bpkwh) && !isNaN(akwh) && !isNaN(apkwh)) {
+                    const before = bkwh * bpkwh;
+                    const after = akwh * apkwh;
+                    const projected = (!isNaN(nskwh) && !isNaN(nspkwh)) ? nskwh * nspkwh : before;
+                    const savings = projected - after;
+                    const pctSaved = projected !== 0 ? (savings / projected) * 100 : 0;
+                    const netSavings = savings - sys.monthlyLoan;
+
+                    rows.push({
+                        ...m, bkwh, bpkwh, akwh, apkwh, nskwh: nskwh||0, nspkwh: nspkwh||0,
+                        before, after, projected, savings, pctSaved, netSavings
+                    });
+
+                    totalBefore += before;
+                    totalAfter += after;
+                    totalProjected += projected;
+                    totalSavings += savings;
+                    monthsWithData++;
+                }
+            });
+
+            if (rows.length === 0) {
+                alert('Please enter at least one month with Before Solar and After Solar kWh + ₱/kWh.');
+                return;
+            }
+
+            const avgMonthlySavings = totalSavings / monthsWithData;
+            const totalNetSavings = totalSavings - (sys.monthlyLoan * monthsWithData);
+            const avgNetSavings = totalNetSavings / monthsWithData;
+            const totalPctSaved = totalProjected !== 0 ? (totalSavings / totalProjected) * 100 : 0;
+            const paybackMonths = avgMonthlySavings > 0 ? sys.totalMortgage / avgMonthlySavings : Infinity;
+            const paybackYears = paybackMonths / 12;
+            const paidPercent = sys.totalMortgage > 0 ? Math.min((totalSavings / sys.totalMortgage) * 100, 100) : 0;
+
+            // --- Save to CSV ---
+            if (fileHandle) {
+                const calcDate = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+                const newRows = rows.map(r => {
+                    const monthInYear = (r.index % 12) + 1;
+                    const yearGroup = Math.floor(r.index / 12) + 1;
+                    return {
+                    calcDate,
+                    savedCalId: String(monthInYear).padStart(2,'0') + String(yearGroup).padStart(2,'0'),
+                    month: r.short,
+                    beforeYear: String(r.beforeYear),
+                    afterYear: String(r.afterYear),
+                    bkwh: r.bkwh.toFixed(2),
+                    bpkwh: r.bpkwh.toFixed(4),
+                    before: r.before.toFixed(2),
+                    akwh: r.akwh.toFixed(2),
+                    apkwh: r.apkwh.toFixed(4),
+                    after: r.after.toFixed(2),
+                    nskwh: r.nskwh.toFixed(2),
+                    nspkwh: r.nspkwh.toFixed(4),
+                    projected: r.projected.toFixed(2),
+                    savings: r.savings.toFixed(2),
+                    pctSaved: r.pctSaved.toFixed(1),
+                    netVsLoan: r.netSavings.toFixed(2),
+                    sysCost: sys.systemCost.toFixed(2),
+                    sysLoan: sys.monthlyLoan.toFixed(2),
+                    sysMonths: String(sys.totalMonths),
+                    sysMortgage: sys.totalMortgage.toFixed(2)
+                };
+                });
+                // Replace existing batch for same date to prevent duplicates
+                historyData = historyData.filter(r => r.calcDate !== calcDate);
+                historyData = [...newRows, ...historyData];
+                await writeToFile();
+                renderHistory();
+                showToast();
+            }
+
+            // --- Render Summary ---
+            document.getElementById('summaryGrid').innerHTML = `
+                <div class="summary-box highlight-red">
+                    <div class="s-label">Total Before Solar</div>
+                    <div class="s-value red">${formatPeso(totalBefore)}</div>
+                    <div class="s-sub">${monthsWithData} month${monthsWithData>1?'s':''} — old bills</div>
+                </div>
+                <div class="summary-box highlight-yellow">
+                    <div class="s-label">Est. Without Solar</div>
+                    <div class="s-value yellow">${formatPeso(totalProjected)}</div>
+                    <div class="s-sub">no solar kWh × ₱/kWh</div>
+                </div>
+                <div class="summary-box highlight-green">
+                    <div class="s-label">Total After Solar</div>
+                    <div class="s-value green">${formatPeso(totalAfter)}</div>
+                    <div class="s-sub">${monthsWithData} month${monthsWithData>1?'s':''} — actual with solar</div>
+                </div>
+                <div class="summary-box highlight-green">
+                    <div class="s-label">Total Real Savings</div>
+                    <div class="s-value green">${formatPeso(totalSavings)}</div>
+                    <div class="s-sub">est. without solar − after solar</div>
+                </div>
+                <div class="summary-box highlight-orange">
+                    <div class="s-label">Avg Monthly Savings</div>
+                    <div class="s-value orange">${formatPeso(avgMonthlySavings)}</div>
+                    <div class="s-sub">before loan deduction</div>
+                </div>
+                <div class="summary-box highlight-blue">
+                    <div class="s-label">Total Loan Paid</div>
+                    <div class="s-value blue">${formatPeso(sys.monthlyLoan * monthsWithData)}</div>
+                    <div class="s-sub">${monthsWithData} × ${formatPeso(sys.monthlyLoan)}</div>
+                </div>
+                <div class="summary-box ${totalNetSavings >= 0 ? 'highlight-green' : 'highlight-red'}">
+                    <div class="s-label">Net After Loan</div>
+                    <div class="s-value ${totalNetSavings >= 0 ? 'green' : 'red'}">${totalNetSavings >= 0 ? '' : '-'}${formatPeso(totalNetSavings)}</div>
+                    <div class="s-sub">savings minus loan payments</div>
+                </div>
+                <div class="summary-box ${totalPctSaved > 0 ? 'highlight-green' : 'highlight-red'}">
+                    <div class="s-label">Overall % Saved</div>
+                    <div class="s-value ${totalPctSaved > 0 ? 'green' : 'red'}">${totalPctSaved.toFixed(1)}%</div>
+                    <div class="s-sub">${totalPctSaved > 0 ? 'saved vs projected bills' : 'bills went up'}</div>
+                </div>
+                <div class="summary-box highlight-yellow">
+                    <div class="s-label">Est. Payback Period</div>
+                    <div class="s-value yellow">${paybackMonths === Infinity ? '—' : paybackYears.toFixed(1) + ' yrs'}</div>
+                    <div class="s-sub">${paybackMonths === Infinity ? 'N/A' : Math.ceil(paybackMonths) + ' months vs ' + formatPeso(sys.totalMortgage) + ' mortgage'}</div>
+                </div>
+            `;
+
+            // --- Bar Chart ---
+            const maxBill = Math.max(...rows.map(r => Math.max(r.before, r.projected, r.after)));
+            document.getElementById('barChart').innerHTML = rows.map(r => {
+                const bW = maxBill > 0 ? (r.before / maxBill) * 100 : 0;
+                const pW = maxBill > 0 ? (r.projected / maxBill) * 100 : 0;
+                const aW = maxBill > 0 ? (r.after / maxBill) * 100 : 0;
+                return `<div style="margin-bottom:10px;">
+                    <div style="font-size:0.72rem;color:#787b86;margin-bottom:3px;font-weight:600;">${r.name} '${String(r.beforeYear).slice(-2)} → '${String(r.afterYear).slice(-2)}</div>
+                    <div class="bar-container">
+                        <div class="bar-track"><div class="bar-fill bar-before" style="width:${bW}%">${formatPeso(r.before)}</div></div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-track"><div class="bar-fill bar-projected" style="width:${pW}%">${formatPeso(r.projected)}</div></div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-track"><div class="bar-fill bar-after" style="width:${aW}%">${formatPeso(r.after)}</div></div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // --- Detail Table ---
+            document.getElementById('resultsBody').innerHTML = rows.map(r => {
+                const savCls = r.savings > 0 ? 'savings-cell' : r.savings < 0 ? 'loss-cell' : '';
+                const netCls = r.netSavings > 0 ? 'savings-cell' : r.netSavings < 0 ? 'loss-cell' : '';
+                const pctCls = r.pctSaved > 0 ? 'negative' : r.pctSaved < 0 ? 'positive' : '';
+                return `<tr>
+                    <td>${r.short} '${String(r.beforeYear).slice(-2)}→'${String(r.afterYear).slice(-2)}</td>
+                    <td>${formatPeso(r.before)}<br><span style="font-size:0.6rem;color:#4a4e59;">${r.bkwh}kWh</span></td>
+                    <td class="yellow">${formatPeso(r.projected)}<br><span style="font-size:0.6rem;color:#4a4e59;">${r.nskwh}kWh</span></td>
+                    <td>${formatPeso(r.after)}<br><span style="font-size:0.6rem;color:#4a4e59;">${r.akwh}kWh</span></td>
+                    <td class="${savCls}">${r.savings >= 0 ? '' : '-'}${formatPeso(r.savings)}</td>
+                    <td class="${pctCls}">${r.pctSaved.toFixed(1)}%</td>
+                    <td class="${netCls}">${r.netSavings >= 0 ? '' : '-'}${formatPeso(r.netSavings)}</td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('resultsFoot').innerHTML = `<tr style="font-weight:700;border-top:2px solid #2a2e39;">
+                <td>TOTAL</td>
+                <td class="red">${formatPeso(totalBefore)}</td>
+                <td class="yellow">${formatPeso(totalProjected)}</td>
+                <td class="green">${formatPeso(totalAfter)}</td>
+                <td class="savings-cell">${formatPeso(totalSavings)}</td>
+                <td class="${totalPctSaved>0?'negative':'positive'}">${totalPctSaved.toFixed(1)}%</td>
+                <td class="${totalNetSavings>=0?'savings-cell':'loss-cell'}">${totalNetSavings>=0?'':'-'}${formatPeso(totalNetSavings)}</td>
+            </tr>`;
+
+            // --- Payback Progress ---
+            document.getElementById('paybackSection').innerHTML = `
+                <div class="payback-bar-track">
+                    <div class="payback-bar-fill" style="width:${Math.min(paidPercent,100)}%">${paidPercent.toFixed(1)}%</div>
+                </div>
+                <div class="payback-info">
+                    <span>₱0</span>
+                    <span>Savings so far: ${formatPeso(totalSavings)} of ${formatPeso(sys.totalMortgage)} total mortgage</span>
+                    <span>${formatPeso(sys.totalMortgage)}</span>
+                </div>
+            `;
+
+            // --- Verdict ---
+            const verdictBox = document.getElementById('verdictBox');
+            let verdictClass, verdictText;
+
+            if (avgNetSavings > 0) {
+                verdictClass = 'positive-verdict';
+                verdictText = `You're saving an average of ${formatPeso(avgNetSavings)}/month even after the ${formatPeso(sys.monthlyLoan)} loan payment! ` +
+                    `Solar is already paying for itself. Total mortgage: ${formatPeso(sys.totalMortgage)} over ${sys.totalMonths} months. Est. payback: ~${paybackYears.toFixed(1)} years.`;
+            } else if (totalSavings > 0) {
+                verdictClass = 'neutral-verdict';
+                verdictText = `Accounting for price increases, you're saving ${formatPeso(totalSavings)} total vs what you'd pay without solar. ` +
+                    `The ${formatPeso(sys.monthlyLoan)}/month loan offsets savings for now, but after the loan ends you keep pure savings! ` +
+                    `Total mortgage: ${formatPeso(sys.totalMortgage)} (${formatPeso(sys.interestPaid)} in interest).`;
+            } else {
+                verdictClass = 'negative-verdict';
+                verdictText = `Bills haven't decreased yet. Could be seasonal — keep tracking to see the full picture over the loan period.`;
+            }
+
+            verdictBox.innerHTML = `<div class="verdict-box ${verdictClass}">${verdictText}</div>`;
+
+            document.getElementById('resultsCard').classList.remove('hidden');
+            document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && months.length > 0) calculateSavings();
+        });
+
+        updateSystemDisplay();
+        renderHistory();
+    </script>
+</body>
+</html>
