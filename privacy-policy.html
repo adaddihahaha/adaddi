@@ -5,28 +5,55 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Privacy Policy — Solar Savings</title>
   <meta name="robots" content="index,follow">
-  <style>body{font-family:system-ui, -apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:#f6f7fb;color:#222}main{max-width:900px;margin:28px auto;padding:22px;background:#fff;border-radius:8px}h1{color:#0b6}a{color:#0b6}</style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <h1>Privacy Policy</h1>
-    <p>Effective date: <span id="date"></span></p>
-    <p>This website provides tools and informational content about solar savings. We respect your privacy. The site is primarily static and runs tools in your browser; by default we do not collect personal information or transmit your calculator data to any server.</p>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">☀</div>
+        <div>
+          <h1>Adaddi</h1>
+          <div class="muted">Collection of electricity & solar calculation tools</div>
+        </div>
+      </div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="solar-savings.html">Solar Savings</a>
+        <a href="about.html">About</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </nav>
+    </header>
 
-    <h2>Data and tools</h2>
-    <p>The Solar Savings Tool performs calculations in your browser and can save results as a CSV file on your device if you choose. That file remains on your device unless you manually share it. We do not upload or store your CSV files on this site.</p>
+    <main class="card">
+      <h1>Privacy Policy</h1>
+      <p>Effective date: <span id="date"></span></p>
+      <p>This website provides tools and informational content about solar savings. We respect your privacy. The site is primarily static and runs tools in your browser; these tools are not guaranteed to work offline and some features may require network access. By default we do not collect personal information or transmit your calculator data to any server unless you explicitly choose to share or upload it.</p>
 
-    <h2>Advertising and cookies</h2>
-    <p>The site may display third-party advertising (for example, Google AdSense). Third-party ad services may set cookies and collect data according to their own policies. We recommend reviewing the privacy policy of the ad provider you use.</p>
+      <h2>Data and tools</h2>
+      <p>The Solar Savings Tool performs calculations in your browser and can save results as a CSV file on your device if you choose. That file remains on your device unless you manually share or upload it. We do not upload or store your CSV files on this site unless you explicitly use a sharing/upload feature.</p>
 
-    <h2>Third-party content</h2>
-    <p>Links to external resources are provided for convenience and do not imply endorsement. We are not responsible for third-party privacy practices.</p>
+      <h2>Advertising and cookies</h2>
+      <p>This site may display third-party advertising, such as Google AdSense. Third-party ad networks may use cookies, web beacons, or similar technologies to serve ads tailored to your interests and to measure ad performance. Those providers collect information about your visits to this site and other sites, and they may use that information to show you relevant ads.</p>
 
-    <h2>Contact</h2>
-    <p>If you have privacy questions, contact: <a href="mailto:contact@example.com">contact@example.com</a></p>
+      <p>If you place Google AdSense on this site, include your publisher ID in the AdSense loader script in each page's <code>&lt;head&gt;</code> and add an <code>ads.txt</code> file at the site root. Example <code>ads.txt</code> entry (replace <strong>pub-REPLACE_ME</strong> with your publisher ID):</p>
+      <pre style="background:#0b2230;padding:10px;border-radius:6px;color:#bfc4cb;border:1px solid #222">google.com, pub-REPLACE_ME, DIRECT, f08c47fec0942fa0</pre>
 
-    <p style="margin-top:18px"><a href="/">← Back to Home</a></p>
-  </main>
-  <script>document.getElementById('date').textContent=new Date().toLocaleDateString();</script>
+      <p>We recommend reading the privacy policies linked by your ad provider (for Google: <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google Ads &amp; privacy</a>) for details about data collection and opt-out choices. To opt out of personalized advertising from Google, visit <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ad Settings</a>.</p>
+
+      <h2>Third-party content</h2>
+      <p>Links to external resources are provided for convenience and do not imply endorsement. We are not responsible for third-party privacy practices.</p>
+
+      <h2>Contact</h2>
+      <p>If you have privacy questions, contact: <a class="contact" href="mailto:adaddi.hahaha@gmail.com">adaddi.hahaha@gmail.com</a></p>
+
+      <p style="margin-top:18px"><a href="/">← Back to Home</a></p>
+    </main>
+
+    <footer>
+      <div>© <span id="year"></span> Solar Savings — <a href="/">Home</a> • <a href="about.html">About</a></div>
+    </footer>
+  </div>
+  <script>document.getElementById('date').textContent=new Date().toLocaleDateString();document.getElementById('year').textContent=new Date().getFullYear();</script>
 </body>
 </html>

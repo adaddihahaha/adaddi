@@ -5,27 +5,60 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>About — Solar Savings</title>
   <meta name="robots" content="index,follow">
-  <style>body{font-family:system-ui, -apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:#f6f7fb;color:#222}main{max-width:900px;margin:28px auto;padding:22px;background:#fff;border-radius:8px}h1{color:#0b6}a{color:#0b6}</style>
+  <!-- Google AdSense placeholder: replace ca-pub-REPLACE_ME with your publisher ID -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-REPLACE_ME" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <h1>About Solar Savings</h1>
-    <p>This project provides simple, privacy-first tools to help households and small businesses understand the financial impact of switching to solar.</p>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">☀</div>
+        <div>
+          <h1>Adaddi</h1>
+          <div class="muted">Collection of electricity & solar calculation tools</div>
+        </div>
+      </div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="solar-savings.html">Solar Savings</a>
+        <a href="about.html">About</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </nav>
+    </header>
 
-    <h2>Our goals</h2>
-    <ul>
-      <li>Give clear, practical calculators to estimate savings and payback.</li>
-      <li>Keep tools offline-friendly and private by running calculations in your browser.</li>
-      <li>Expand to several utilities tools: upcoming <strong>Appliances Electricity Calculator</strong>, system sizing helper, and comparison charts.</li>
-    </ul>
+    <div style="margin:12px 0;text-align:center">
+      <div class="ad-placeholder">Ad slot — replace with your Google AdSense ad unit (mobile-responsive)</div>
+    </div>
 
-    <h2>Planned features</h2>
-    <p>Next: an Appliances Electricity Calculator (estimate kWh per appliance and monthly cost). Future updates will add guides for system selection and installer comparison.</p>
+    <main class="card">
+      <h1>About Solar Savings</h1>
+      <p>Solar Savings is a focused collection of calculators and utilities for electricity and solar planning. The site groups tools that help estimate bills, model payback, and size small rooftop systems.</p>
 
-    <h2>Contact</h2>
-    <p>Feedback and partnership inquiries: <a href="mailto:contact@example.com">contact@example.com</a></p>
+      <h2>Our goals</h2>
+      <ul>
+        <li>Provide clear, practical calculators to estimate savings and payback.</li>
+        <li>Run interactive tools in the browser (note: tools are not guaranteed to run offline and some features may require network access).</li>
+        <li>Expand the toolbox with utilities such as an <strong>Appliances Electricity Calculator</strong>, a system sizing helper, and comparison charts.</li>
+      </ul>
 
-    <p style="margin-top:18px"><a href="/">← Back to Home</a></p>
-  </main>
+      <h2>Planned features</h2>
+      <p>Next: an Appliances Electricity Calculator (estimate kWh per appliance and monthly cost). Future updates will add guides for system selection and installer comparison.</p>
+
+      <h2>Contact</h2>
+      <p>Feedback and partnership inquiries: <a class="contact" href="mailto:adaddi.hahaha@gmail.com">adaddi.hahaha@gmail.com</a></p>
+
+      <p style="margin-top:18px"><a href="/">← Back to Home</a></p>
+    </main>
+
+    <div style="margin:12px 0;text-align:center">
+      <div class="ad-placeholder">Ad slot — replace with your Google AdSense ad unit (mobile-responsive)</div>
+    </div>
+
+    <footer>
+      <div>© <span id="year"></span> Solar Savings — <a href="privacy-policy.html">Privacy Policy</a> • <a href="/">Home</a></div>
+    </footer>
+  </div>
+  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 </body>
 </html>
