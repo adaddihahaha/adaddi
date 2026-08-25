@@ -17,6 +17,13 @@ nav, .site-nav{display:flex;gap:12px}
 nav a, .site-nav a, a, a.small-link, a.contact{color:var(--link);text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600}
 a {padding: 0;}
 nav a:hover, .site-nav a:hover, a:hover, a.small-link:hover, a.contact:hover{background:#0b2230;color:var(--link-hover)}
+/* Dropdown menu for Tools */
+.tools-menu{position:relative}
+.tools-menu .menu-title{cursor:pointer;padding:8px 10px;border-radius:8px}
+.tools-menu .menu-list{position:absolute;top:40px;left:0;background:var(--card);border:1px solid #222;padding:8px;border-radius:8px;display:none;min-width:220px;box-shadow:0 8px 20px rgba(0,0,0,0.4);z-index:50}
+.tools-menu .menu-list a{display:block;padding:8px;border-radius:6px;margin:0;color:var(--link);font-weight:600}
+.tools-menu .menu-list a:hover{background:#0b2230;color:var(--link-hover)}
+.tools-menu:hover .menu-list{display:block}
 .hero{background:var(--card);padding:22px;border-radius:12px;border:1px solid #2a2e39;margin-bottom:18px}
 .hero p{color:#bfc4cb;margin-top:8px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:18px}
