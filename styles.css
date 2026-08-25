@@ -30,6 +30,8 @@ a.small-link{color:#9fd6ff}
 
 /* Solar-savings specific layout (kept together) */
 :root{/* ensure variables available */}
+/* lighter accent for subtle button backgrounds */
+:root{--accent-light:#f9b66a}
 .container{max-width:920px}
 .subtitle{color:#787b86;font-size:0.85rem;margin-bottom:30px;text-align:center}
 .card-title{color:#d1d4dc}
@@ -129,6 +131,12 @@ th:first-child{text-align:left}td{text-align:center}td:first-child{font-weight:6
 .consent-message{color:#d3d6dc;max-width:72%}
 .consent-message .consent-text{color:var(--muted);font-size:0.95rem;margin-top:6px}
 .consent-actions .btn{margin-left:8px}
+.consent-actions .btn-consent{background:var(--accent-light);color:#111;border:none;padding:10px 14px;border-radius:8px;font-weight:700}
+.consent-actions .btn-consent:hover{background:var(--accent);}
+.consent-actions .btn-manage{background:transparent;border:1px solid #363a45;color:#bfc4cb;padding:10px 12px;border-radius:8px}
+.consent-manage .btn{margin-left:0}
+.consent-manage .btn-save{background:var(--accent);color:#111;border:none;padding:8px 12px;border-radius:8px}
+.consent-manage .btn-cancel{background:transparent;border:1px solid #363a45;color:#bfc4cb;padding:8px 12px;border-radius:8px;margin-left:8px}
 .consent-manage{margin-top:12px;background:#12161a;padding:12px;border-radius:8px;border:1px solid #222}
 .consent-manage.hidden{display:none}
 .manage-inner h3{color:var(--accent);margin:0 0 8px 0}
