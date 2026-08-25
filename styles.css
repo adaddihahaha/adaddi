@@ -122,3 +122,14 @@ th:first-child{text-align:left}td{text-align:center}td:first-child{font-weight:6
   input[type="number"]{padding:6px 4px;font-size:0.78rem}
   .tooltip-icon:hover::after{right:-5px;width:200px}
 }
+
+/* Consent banner */
+.consent-banner{position:fixed;left:0;right:0;bottom:18px;background:linear-gradient(180deg,#0f1923, #0c161b);border:1px solid #222;padding:14px 18px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);z-index:9999;margin:0 12px}
+.consent-inner{display:flex;gap:16px;align-items:center;justify-content:space-between}
+.consent-message{color:#d3d6dc;max-width:72%}
+.consent-message .consent-text{color:var(--muted);font-size:0.95rem;margin-top:6px}
+.consent-actions .btn{margin-left:8px}
+.consent-manage{margin-top:12px;background:#12161a;padding:12px;border-radius:8px;border:1px solid #222}
+.consent-manage.hidden{display:none}
+.manage-inner h3{color:var(--accent);margin:0 0 8px 0}
+.manage-inner label{color:#bfc4cb}
