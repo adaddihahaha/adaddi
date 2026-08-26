@@ -1,0 +1,20 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+
+type Month = { before: string; beforeRate: string; after: string; afterRate: string; projected: string; projectedRate: string };
+const money = (value: number) => `₱${Math.abs(value).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const blank = (): Month => ({ before: '', beforeRate: '', after: '', afterRate: '', projected: '', projectedRate: '' });
+
+export function SolarTracker() {
+  const [systemCost, setSystemCost] = useState('0');
+  const [loan, setLoan] = useState('0');
+  const [months, setMonths] = useState('6');
+  const [rows, setRows] = useState<Month[]>(Array.from({ length: 6 }, blank));
+  const [calculated, setCalculated] = useState(false);
+  const totals = useMemo(() => rows.reduce((total, row) => { const before = Number(row.before) * Number(row.beforeRate); const after = Number(row.after) * Number(row.afterRate); const projected = row.projected && row.projectedRate ? Number(row.projected) * Number(row.projectedRate) : before; return { before: total.before + (before || 0), after: total.after + (after || 0), projected: total.projected + (projected || 0) }; }, { before: 0, after: 0, projected: 0 }), [rows]);
+  const savings = totals.projected - totals.after;
+  const updateMonths = (value: string) => { const count = Math.min(120, Math.max(1, Number(value) || 1)); setMonths(String(count)); setRows(Array.from({ length: count }, (_, i) => rows[i] || blank())); setCalculated(false); };
+  const update = (index: number, field: keyof Month, value: string) => setRows(rows.map((row, i) => i === index ? { ...row, [field]: value } : row));
+  return <div className="tracker"><section className="calc-panel"><div className="panel-heading"><span className="eyebrow">Scenario setup</span><h2>Solar system details</h2></div><div className="form-grid"><label>System cost (₱)<input type="number" value={systemCost} onChange={e => setSystemCost(e.target.value)} /></label><label>Monthly loan (₱)<input type="number" value={loan} onChange={e => setLoan(e.target.value)} /></label><label>Total months<input type="number" value={months} min="1" max="120" onChange={e => updateMonths(e.target.value)} /></label></div><p className="formula-note">Total mortgage: <strong>{money(Number(loan || 0) * Number(months || 0))}</strong> · Interest: {money(Number(loan || 0) * Number(months || 0) - Number(systemCost || 0))}</p></section><section className="calc-panel"><div className="panel-heading"><span className="eyebrow">Monthly inputs</span><h2>Compare each bill</h2><p>Enter kWh and rate for before solar, after solar, and optional estimated no-solar use.</p></div><div className="table-wrap"><table className="input-table"><thead><tr><th>Month</th><th>Before kWh</th><th>₱/kWh</th><th>After kWh</th><th>₱/kWh</th><th>No solar kWh</th><th>₱/kWh</th></tr></thead><tbody>{rows.map((row, index) => <tr key={index}><td>Month {index + 1}</td>{(['before','beforeRate','after','afterRate','projected','projectedRate'] as const).map(field => <td key={field}><input aria-label={`${field} month ${index + 1}`} type="number" step="any" value={row[field]} onChange={e => update(index, field, e.target.value)} /></td>)}</tr>)}</tbody></table></div><button className="button" onClick={() => setCalculated(true)}>Calculate savings →</button></section>{calculated && <section className="results-grid"><div><span className="eyebrow">Projected without solar</span><strong>{money(totals.projected)}</strong><small>{months} months</small></div><div><span className="eyebrow">Solar bill total</span><strong>{money(totals.after)}</strong><small>{money(savings)} gross savings</small></div><div><span className="eyebrow">Average monthly savings</span><strong>{money(savings / Number(months))}</strong><small>Before loan payment</small></div><div><span className="eyebrow">Estimated payback</span><strong>{savings > 0 ? `${(Number(systemCost || 0) / (savings / Number(months)) / 12).toFixed(1)} yrs` : '—'}</strong><small>Based on system cost</small></div></section>}</div>;
+}
