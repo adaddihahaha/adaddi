@@ -49,6 +49,7 @@ export function SiteHeader() {
             <Link href="/appliances" onClick={closeMenu}>Appliances Calculator</Link>
           </div>
         </details>
+        <Link href="/blog" onClick={closeMenu}>Blog</Link>
         <Link href="/about" onClick={closeMenu}>About</Link>
         <Link href="/privacy-policy" onClick={closeMenu}>Privacy</Link>
       </nav>
