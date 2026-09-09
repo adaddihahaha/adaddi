@@ -42,12 +42,17 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
           <div className="blog-grid">
             {visiblePosts.map((post) => (
               <article className="blog-card" key={post._id}>
-                {post.mainImage ? <img src={urlFor(post.mainImage).width(900).height(560).fit('crop').url()} alt="" /> : null}
+                {post.mainImage ? (
+                  <Link className="blog-card-image" href={`/blog/${post.slug}`} aria-label={`Read ${post.title}`}>
+                    <img src={urlFor(post.mainImage).width(900).height(560).fit('crop').url()} alt="" />
+                  </Link>
+                ) : null}
                 <div className="blog-card-body">
-                  <div className="blog-meta"><span>{formatDate(post.publishedAt)}</span>{post.categories?.[0] ? <span>{post.categories[0].title}</span> : null}</div>
+                  {post.categories?.[0] ? <span className="blog-card-eyebrow">{post.categories[0].title}</span> : null}
                   <h2><Link href={`/blog/${post.slug}`}>{post.title}</Link></h2>
+                  <p className="blog-card-date">{formatDate(post.publishedAt)}</p>
                   {post.excerpt ? <p>{post.excerpt}</p> : null}
-                  <Link className="card-link" href={`/blog/${post.slug}`}>Read note →</Link>
+                  <Link className="card-link" href={`/blog/${post.slug}`}>Read note <span aria-hidden="true">→</span></Link>
                 </div>
               </article>
             ))}
