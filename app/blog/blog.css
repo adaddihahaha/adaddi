@@ -122,13 +122,22 @@
 }
 
 .blog-card .card-link {
+  align-items: center;
+  background: var(--orange);
+  border-radius: 6px;
+  color: #fff;
   display: inline-flex;
+  font-family: inherit;
+  font-size: .8rem;
+  font-weight: 700;
   gap: 8px;
   margin-top: auto;
-  padding-top: 18px;
-  color: var(--teal);
-  font-weight: 600;
+  padding: 9px 13px;
   text-decoration: none
+}
+
+.blog-card .card-link:hover {
+  filter: brightness(.93)
 }
 
 .blog-card .card-link span {
