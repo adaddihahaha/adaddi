@@ -11,7 +11,7 @@ export default async function BlogPage() {
 
   return (
     <main className="content-page blog-page">
-      <div className="tool-intro">
+      <div>
         <span className="eyebrow">Field notes</span>
         <h1>Useful ideas for better energy decisions.</h1>
         <p>Practical context, explainers, and lessons from the numbers behind your electricity bill.</p>
