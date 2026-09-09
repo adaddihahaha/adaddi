@@ -14,6 +14,11 @@ export function urlFor(source: any) {
   return builder.image(source)
 }
 
+export const categoriesQuery = `*[_type == "category"] | order(title asc) {
+  _id,
+  title
+}`
+
 export const postsQuery = `*[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
   _id,
   title,
@@ -37,6 +42,11 @@ export const postQuery = `*[_type == "post" && slug.current == $slug][0] {
   categories[]->{title}
 }`
 
+export type BlogCategory = {
+  _id: string
+  title: string
+}
+
 export type BlogPost = {
   _id: string
   title: string
@@ -54,6 +64,10 @@ export type BlogPostDetail = BlogPost & {
 
 export async function getPosts() {
   return sanityClient.fetch<BlogPost[]>(postsQuery, {}, { next: { revalidate: 60 } })
+}
+
+export async function getCategories() {
+  return sanityClient.fetch<BlogCategory[]>(categoriesQuery, {}, { next: { revalidate: 60 } })
 }
 
 export async function getPost(slug: string) {
