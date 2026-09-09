@@ -1,23 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const toolsMenuRef = useRef<HTMLDetailsElement>(null);
   const closeMenu = () => setMenuOpen(false);
-
-  useEffect(() => {
-    const closeToolsMenu = (event: PointerEvent) => {
-      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target as Node)) {
-        toolsMenuRef.current.removeAttribute('open');
-      }
-    };
-
-    document.addEventListener('pointerdown', closeToolsMenu);
-    return () => document.removeEventListener('pointerdown', closeToolsMenu);
-  }, []);
 
   return (
     <header className="site-header">
@@ -40,15 +28,7 @@ export function SiteHeader() {
       </button>
       <nav id="site-navigation" className={`site-nav${menuOpen ? ' is-open' : ''}`} aria-label="Main navigation">
         <Link href="/" onClick={closeMenu}>Home</Link>
-        <details ref={toolsMenuRef} className="tools-menu" onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node)) event.currentTarget.removeAttribute('open');
-        }}>
-          <summary>Tools</summary>
-          <div className="menu-list">
-            <Link href="/solar-savings" onClick={closeMenu}>Solar Savings Tracker</Link>
-            <Link href="/appliances" onClick={closeMenu}>Appliances Calculator</Link>
-          </div>
-        </details>
+        <Link href="/tools" onClick={closeMenu}>Tools</Link>
         <Link href="/blog" onClick={closeMenu}>Blog</Link>
         <Link href="/about" onClick={closeMenu}>About</Link>
         <Link href="/privacy-policy" onClick={closeMenu}>Privacy</Link>

@@ -1105,6 +1105,105 @@ td input {
 	}
 }
 
+.tools-page {
+	padding-bottom: 24px
+}
+
+.tools-hero {
+	display: grid;
+	grid-template-columns: 1.2fr .8fr;
+	gap: 64px;
+	align-items: end;
+	padding: 58px 0 54px;
+	border-top: 1px solid var(--line);
+	border-bottom: 1px solid var(--line)
+}
+
+.tools-hero h1 {
+	max-width: 760px;
+	margin-bottom: 0
+}
+
+.tools-intro {
+	max-width: 390px;
+	margin-bottom: 6px;
+	color: var(--muted);
+	font-size: 1.02rem
+}
+
+.tools-section-head {
+	padding-top: 48px
+}
+
+.tools-section-head h2 {
+	margin: 10px 0 0
+}
+
+.tools-directory-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px
+}
+
+.directory-card {
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	overflow: hidden;
+	background: var(--panel);
+	border: 1px solid var(--line)
+}
+
+.directory-image-wrap {
+	aspect-ratio: 1.55;
+	overflow: hidden;
+	background: #e9dfcf
+}
+
+.directory-image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform .35s ease
+}
+
+.directory-card:hover .directory-image {
+	transform: scale(1.035)
+}
+
+.directory-card-body {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 24px
+}
+
+.directory-kicker {
+	color: var(--teal);
+	font-family: 'DM Mono', monospace;
+	font-size: .68rem;
+	letter-spacing: .08em;
+	text-transform: uppercase
+}
+
+.directory-card h3 {
+	margin: 10px 0;
+	font-size: 1.35rem
+}
+
+.directory-card p {
+	margin-bottom: 0;
+	color: var(--muted);
+	font-size: .9rem
+}
+
+.directory-link {
+	align-self: flex-start
+}
+
 .menu-toggle {
 	display: none;
 	border: 1px solid var(--line);
@@ -1207,9 +1306,19 @@ td input {
 		float: right
 	}
 
-	.hero {
-		padding-top: 40px
-	}
+		.tools-hero {
+			grid-template-columns: 1fr;
+			gap: 24px;
+			padding: 40px 0
+		}
+
+		.tools-directory-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr))
+		}
+
+		.hero {
+			padding-top: 40px
+		}
 
 	.content-page {
 		padding-top: 30px
