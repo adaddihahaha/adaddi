@@ -16,19 +16,17 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
   return (
     <div className="blog-layout">
       <aside className="blog-sidebar" aria-label="Blog categories">
-        <span className="eyebrow">Browse by topic</span>
-        <label className="category-select-label" htmlFor="blog-category">Choose a category</label>
         <select
           id="blog-category"
           className="category-select"
           value={selectedCategory}
           onChange={(event) => setSelectedCategory(event.target.value)}
         >
-          <option value="all">All notes</option>
+          <option value="all">All Blogs</option>
           {categories.map((category) => <option key={category._id} value={category.title}>{category.title}</option>)}
         </select>
         <nav className="category-list" aria-label="Filter blog posts">
-          <button className={selectedCategory === 'all' ? 'category-link active' : 'category-link'} onClick={() => setSelectedCategory('all')}>All notes</button>
+          <button className={selectedCategory === 'all' ? 'category-link active' : 'category-link'} onClick={() => setSelectedCategory('all')}>All Blogs</button>
           {categories.map((category) => (
             <button key={category._id} className={selectedCategory === category.title ? 'category-link active' : 'category-link'} onClick={() => setSelectedCategory(category.title)}>
               {category.title}
