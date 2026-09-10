@@ -9,7 +9,7 @@ export const schemaTypes = [
       { name: 'excerpt', title: 'Excerpt', type: 'text', rows: 3 },
       { name: 'publishedAt', title: 'Published at', type: 'datetime', validation: (Rule: any) => Rule.required() },
       { name: 'author', title: 'Author', type: 'reference', to: [{ type: 'author' }] },
-      { name: 'mainImage', title: 'Main image', type: 'image', options: { hotspot: true } },
+      { name: 'mainImage', title: 'Main image', type: 'image', description: 'Recommended size: 1200 × 675 px (16:9), matching the Tools card image ratio.', options: { hotspot: true } },
       { name: 'categories', title: 'Categories', type: 'array', of: [{ type: 'reference', to: [{ type: 'category' }] }] },
       { name: 'body', title: 'Body', type: 'array', of: [{ type: 'block' }, { type: 'image', options: { hotspot: true } }] },
     ],
