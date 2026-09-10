@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
+import './blog/blog.css';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { ConsentBanner } from '@/components/consent-banner';
@@ -31,6 +32,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-S8FBB1PMVP"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){window.dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-S8FBB1PMVP');
+          `}
+        </Script>
       </body>
     </html>
   );
