@@ -27,7 +27,8 @@ export const postsQuery = `*[_type == "post" && defined(slug.current) && publish
   publishedAt,
   "author": author->{name},
   mainImage,
-  categories[]->{title}
+  categories[]->{title},
+  seo
 }`
 
 export const postQuery = `*[_type == "post" && slug.current == $slug][0] {
@@ -39,12 +40,21 @@ export const postQuery = `*[_type == "post" && slug.current == $slug][0] {
   "author": author->{name},
   mainImage,
   body,
-  categories[]->{title}
+  categories[]->{title},
+  seo
 }`
 
 export type BlogCategory = {
   _id: string
   title: string
+}
+
+export type BlogPostSeo = {
+  metaTitle?: string
+  metaDescription?: string
+  canonicalUrl?: string
+  ogImage?: unknown
+  noIndex?: boolean
 }
 
 export type BlogPost = {
@@ -56,6 +66,7 @@ export type BlogPost = {
   author?: { name: string }
   mainImage?: unknown
   categories?: { title: string }[]
+  seo?: BlogPostSeo
 }
 
 export type BlogPostDetail = BlogPost & {
