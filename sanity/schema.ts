@@ -1,7 +1,7 @@
 export const schemaTypes = [
   {
     name: 'post',
-    title: 'Blog post',
+    title: 'Blogs',
     type: 'document',
     fields: [
       { name: 'title', title: 'Title', type: 'string', validation: (Rule: any) => Rule.required() },
@@ -27,6 +27,6 @@ export const schemaTypes = [
       { name: 'body', title: 'Body', type: 'array', of: [{ type: 'block' }, { type: 'image', options: { hotspot: true } }] },
     ],
   },
-  { name: 'author', title: 'Author', type: 'document', fields: [{ name: 'name', title: 'Name', type: 'string', validation: (Rule: any) => Rule.required() }] },
-  { name: 'category', title: 'Category', type: 'document', fields: [{ name: 'title', title: 'Title', type: 'string', validation: (Rule: any) => Rule.required() }] },
+  { name: 'author', title: 'Authors', type: 'document', fields: [{ name: 'name', title: 'Name', type: 'string', validation: (Rule: any) => Rule.required() }] },
+  { name: 'category', title: 'Categories', type: 'document', fields: [{ name: 'title', title: 'Title', type: 'string', validation: (Rule: any) => Rule.required() }] },
 ]
