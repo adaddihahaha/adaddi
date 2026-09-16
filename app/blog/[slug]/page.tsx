@@ -70,7 +70,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <span className="eyebrow">{formatDate(post.publishedAt)}</span>
           <h1>{post.title}</h1>
           {post.excerpt ? <p>{post.excerpt}</p> : null}
-          {post.author ? <span className="post-author">By {post.author.name}</span> : null}
         </div>
         {post.mainImage ? <img className="blog-post-image" src={urlFor(post.mainImage).width(1400).height(760).fit('crop').url()} alt="" /> : null}
         <div className="portable-text"><PortableText value={(post.body ?? []) as any} /></div>
