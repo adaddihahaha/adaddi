@@ -4,38 +4,54 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { formatDate, urlFor, type BlogCategory, type BlogPost } from '@/lib/sanity'
 
+type SortOption = 'a-z' | 'new-old' | 'old-new'
+
 export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categories: BlogCategory[] }) {
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const visiblePosts = useMemo(
-    () => selectedCategory === 'all'
+  const [sort, setSort] = useState<SortOption>('new-old')
+
+  const visiblePosts = useMemo(() => {
+    const filtered = selectedCategory === 'all'
       ? posts
-      : posts.filter((post) => post.categories?.some((category) => category.title === selectedCategory)),
-    [posts, selectedCategory],
-  )
+      : posts.filter((post) => post.categories?.some((category) => category.title === selectedCategory))
+
+    return [...filtered].sort((a, b) => {
+      if (sort === 'a-z') return a.title.localeCompare(b.title)
+      const comparison = new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
+      return sort === 'new-old' ? -comparison : comparison
+    })
+  }, [posts, selectedCategory, sort])
+
+  const chooseCategory = (value: string) => setSelectedCategory(value)
 
   return (
-    <div className="blog-layout">
-      <aside className="blog-sidebar" aria-label="Blog categories">
-        <select
-          id="blog-category"
-          className="category-select"
-          value={selectedCategory}
-          onChange={(event) => setSelectedCategory(event.target.value)}
-        >
-          <option value="all">All Blogs</option>
-          {categories.map((category) => <option key={category._id} value={category.title}>{category.title}</option>)}
-        </select>
-        <nav className="category-list" aria-label="Filter blog posts">
-          <button className={selectedCategory === 'all' ? 'category-link active' : 'category-link'} onClick={() => setSelectedCategory('all')}>All Blogs</button>
-          {categories.map((category) => (
-            <button key={category._id} className={selectedCategory === category.title ? 'category-link active' : 'category-link'} onClick={() => setSelectedCategory(category.title)}>
-              {category.title}
-            </button>
-          ))}
-        </nav>
-      </aside>
+    <>
+      <div className="blog-category-filter" aria-label="Filter blog posts">
+        <div className="sort-control">
+          <select
+            aria-label="Sort blog posts"
+            value={sort}
+            onChange={(event) => setSort(event.target.value as SortOption)}
+          >
+            <option value="new-old">Newest (Default)</option>
+            <option value="old-new">Oldest</option>
+            <option value="a-z">Alphabetical</option>
+          </select>
+        </div>
+        <div className="category-picker">
+          <select
+            aria-label="Filter by category"
+            value={selectedCategory}
+            onChange={(event) => chooseCategory(event.target.value)}
+          >
+            <option value="all">Select Category</option>
+            {categories.map((category) => <option key={category._id} value={category.title}>{category.title}</option>)}
+          </select>
+        </div>
+      </div>
 
-      <section className="blog-results" aria-label="Blog posts">
+      <div className="blog-layout">
+        <section className="blog-results" aria-label="Blog posts">
         {visiblePosts.length === 0 ? (
           <div className="blog-empty"><span className="eyebrow">No notes yet</span><h2>Nothing in this category.</h2><p>Try another topic or browse all field notes.</p></div>
         ) : (
@@ -58,7 +74,8 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
             ))}
           </div>
         )}
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   )
 }

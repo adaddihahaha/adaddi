@@ -1,45 +1,66 @@
-.blog-layout {
-  display: grid;
-  grid-template-columns: 2fr 10fr;
-  gap: 36px;
-  margin-top: 44px
-}
-
-.blog-sidebar {
-  align-self: start;
-  position: sticky;
-}
-
-.category-select-label {
-  display: block;
-  color: var(--muted);
-  font-size: 14px;
-  margin-top: 18px
-}
-
-.category-select {
-  display: none
-}
-
-.category-list {
+.blog-category-filter {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
 }
 
-.category-link {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  cursor: pointer;
+.category-picker,
+.sort-control {
+  position: relative;
+}
+
+.category-picker select,
+.sort-control select {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  display: inline-flex;
   font: inherit;
-  text-align: left;
-  padding: 8px 0
+  min-height: 44px;
+  padding: 0 14px;
 }
 
-.category-link:hover,
-.category-link.active {
-  color: var(--teal)
+.category-picker select,
+.sort-control select {
+  cursor: pointer;
+}
+
+.category-picker select:hover,
+.sort-control select:hover {
+  border-color: var(--teal);
+}
+
+.category-picker select:focus,
+.sort-control select:focus {
+  outline: none;
+}
+
+.category-picker select {
+  appearance: auto;
+}
+
+.sort-control select {
+  appearance: none;
+  background-image: linear-gradient(var(--muted), var(--muted)), linear-gradient(var(--muted), var(--muted)), linear-gradient(var(--muted), var(--muted));
+  background-position: 10px 14px, 10px 21px, 10px 28px;
+  background-repeat: no-repeat;
+  background-size: 14px 2px, 19px 2px, 24px 2px;
+  min-width: 44px;
+  padding: 0;
+  font-size: 0;
+}
+
+.sort-control select:hover,
+.sort-control select:focus {
+  background-image: linear-gradient(var(--teal), var(--teal)), linear-gradient(var(--teal), var(--teal)), linear-gradient(var(--teal), var(--teal));
+}
+
+.blog-layout {
+  margin-top: 24px
 }
 
 .blog-results {
@@ -49,7 +70,7 @@
 
 .blog-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px
 }
 
@@ -165,14 +186,14 @@
 }
 
 .blog-post-heading {
-  padding: 55px 0 35px;
+  padding: 50px 0 35px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line)
 }
 
 .blog-post-heading h1 {
   font-size: clamp(2.8rem, 6vw, 5rem);
-  margin: 15px 0 20px
+  margin: 15px 0 20px;
 }
 
 .post-author {
@@ -185,13 +206,13 @@
   width: 100%;
   max-height: 560px;
   object-fit: cover;
-  margin: 28px 0
+  margin: 50px 0
 }
 
 .portable-text {
   font-size: 1.08rem;
   line-height: 1.75;
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 15px 0 60px
 }
@@ -216,28 +237,14 @@
 }
 
 @media(max-width:900px) {
-  .blog-layout {
-    grid-template-columns: 1fr;
-    gap: 24px
-  }
-
-  .blog-sidebar {
-    position: static
-  }
-
-  .category-list {
-    display: none
+  .blog-category-filter {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .category-select {
-    display: block;
     width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    color: var(--ink);
-    padding: 12px 14px;
-    font: inherit;
-    margin-top: 8px
   }
 
   .blog-grid {
