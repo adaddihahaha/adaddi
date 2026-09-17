@@ -40,6 +40,10 @@
   outline-offset: 2px;
 }
 
+.category-picker select {
+  appearance: auto;
+}
+
 .sort-control select {
   appearance: none;
   background-image: linear-gradient(var(--muted), var(--muted)), linear-gradient(var(--muted), var(--muted)), linear-gradient(var(--muted), var(--muted));
