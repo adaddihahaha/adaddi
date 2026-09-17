@@ -6,7 +6,7 @@ export const schemaTypes = [
     fields: [
       { name: 'title', title: 'Title', type: 'string', validation: (Rule: any) => Rule.required() },
       { name: 'slug', title: 'Slug', type: 'slug', options: { source: 'title', maxLength: 96 }, validation: (Rule: any) => Rule.required() },
-      { name: 'excerpt', title: 'Excerpt', type: 'text', rows: 3 },
+      { name: 'excerpt', title: 'Excerpt', type: 'text', rows: 3, description: 'Short summary shown on blog cards. Maximum 300 characters.', validation: (Rule: any) => Rule.max(300) },
       {
         name: 'seo',
         title: 'SEO settings',

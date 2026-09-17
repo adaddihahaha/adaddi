@@ -14,8 +14,9 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
   )
 
   return (
-    <div className="blog-layout">
-      <aside className="blog-sidebar" aria-label="Blog categories">
+    <>
+      <div className="blog-category-filter">
+        <label htmlFor="blog-category">Browse by category</label>
         <select
           id="blog-category"
           className="category-select"
@@ -25,17 +26,10 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
           <option value="all">All Blogs</option>
           {categories.map((category) => <option key={category._id} value={category.title}>{category.title}</option>)}
         </select>
-        <nav className="category-list" aria-label="Filter blog posts">
-          <button className={selectedCategory === 'all' ? 'category-link active' : 'category-link'} onClick={() => setSelectedCategory('all')}>All Blogs</button>
-          {categories.map((category) => (
-            <button key={category._id} className={selectedCategory === category.title ? 'category-link active' : 'category-link'} onClick={() => setSelectedCategory(category.title)}>
-              {category.title}
-            </button>
-          ))}
-        </nav>
-      </aside>
+      </div>
 
-      <section className="blog-results" aria-label="Blog posts">
+      <div className="blog-layout">
+        <section className="blog-results" aria-label="Blog posts">
         {visiblePosts.length === 0 ? (
           <div className="blog-empty"><span className="eyebrow">No notes yet</span><h2>Nothing in this category.</h2><p>Try another topic or browse all field notes.</p></div>
         ) : (
@@ -58,7 +52,8 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
             ))}
           </div>
         )}
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   )
 }
