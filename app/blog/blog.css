@@ -11,7 +11,7 @@
   position: relative;
 }
 
-.category-picker-trigger,
+.category-picker select,
 .sort-control select {
   align-items: center;
   background: var(--panel);
@@ -32,8 +32,7 @@
   text-align: left;
 }
 
-.category-picker-trigger:hover,
-.category-picker-trigger[aria-expanded='true'],
+.category-picker select:hover,
 .sort-control select:hover {
   border-color: var(--teal);
 }
