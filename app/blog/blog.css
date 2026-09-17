@@ -24,12 +24,9 @@
   padding: 0 14px;
 }
 
-.category-picker-trigger {
+.category-picker select,
+.sort-control select {
   cursor: pointer;
-  gap: 28px;
-  justify-content: space-between;
-  min-width: 220px;
-  text-align: left;
 }
 
 .category-picker select:hover,
@@ -37,90 +34,26 @@
   border-color: var(--teal);
 }
 
-.category-picker-trigger span {
-  color: var(--teal);
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.category-picker-menu {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  box-shadow: 0 14px 35px rgb(0 0 0 / 18%);
-  left: 0;
-  padding: 8px;
-  position: absolute;
-  top: calc(100% + 8px);
-  width: min(290px, 82vw);
-  z-index: 10;
-}
-
-.category-search {
-  background: var(--background);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  color: var(--ink);
-  font: inherit;
-  padding: 10px 11px;
-  width: 100%;
-}
-
-.category-search:focus,
-.sort-control select:focus,
-.category-picker-trigger:focus-visible,
-.category-options button:focus-visible {
+.category-picker select:focus,
+.sort-control select:focus {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
 
-.category-options {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 7px;
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-.category-options button {
-  background: transparent;
-  border: 0;
-  border-radius: 5px;
-  color: var(--ink);
-  cursor: pointer;
-  font: inherit;
-  padding: 10px 11px;
-  text-align: left;
-}
-
-.category-options button:hover,
-.category-options button[aria-selected='true'] {
-  background: color-mix(in srgb, var(--teal) 12%, transparent);
-  color: var(--teal);
-}
-
-.category-no-results {
-  color: var(--muted);
-  font-size: .88rem;
-  margin: 10px 11px;
-}
-
-.sort-control {
-  align-items: center;
-  display: inline-flex;
-  gap: 9px;
-}
-
-.sort-control span {
-  color: var(--muted);
-  font-size: .86rem;
-  font-weight: 600;
-}
-
 .sort-control select {
-  cursor: pointer;
-  padding-right: 34px;
+  appearance: none;
+  background-image: linear-gradient(var(--muted), var(--muted)), linear-gradient(var(--muted), var(--muted)), linear-gradient(var(--muted), var(--muted));
+  background-position: center 14px, center 21px, center 28px;
+  background-repeat: no-repeat;
+  background-size: 18px 2px;
+  font-size: 0;
+  min-width: 44px;
+  padding: 0;
+}
+
+.sort-control select:hover,
+.sort-control select:focus {
+  background-image: linear-gradient(var(--teal), var(--teal)), linear-gradient(var(--teal), var(--teal)), linear-gradient(var(--teal), var(--teal));
 }
 
 .blog-layout {

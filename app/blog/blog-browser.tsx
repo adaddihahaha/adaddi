@@ -38,7 +38,11 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
         </label>
         <label className="sort-control">
           <span className="sr-only">Sort blog posts</span>
-          <select value={sort} onChange={(event) => setSort(event.target.value as SortOption | '')}>
+          <select
+            aria-label="Sort blog posts"
+            value={sort}
+            onChange={(event) => setSort(event.target.value as SortOption | '')}
+          >
             <option value="">Sort By</option>
             <option value="a-z">A - Z</option>
             <option value="new-old">New - Old</option>
