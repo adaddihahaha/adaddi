@@ -34,6 +34,11 @@
   border-color: var(--teal);
 }
 
+.category-picker select:focus,
+.sort-control select:focus {
+  outline: none;
+}
+
 .category-picker select {
   appearance: auto;
 }
