@@ -63,7 +63,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
 
   return (
-    <main className="content-page blog-post-page">
+    <section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, '\\u003c') }} />
       <article>
         <div className="blog-post-heading">
@@ -74,6 +74,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {post.mainImage ? <img className="blog-post-image" src={urlFor(post.mainImage).width(1400).height(760).fit('crop').url()} alt="" /> : null}
         <div className="portable-text"><PortableText value={(post.body ?? []) as any} /></div>
       </article>
-    </main>
+    </section>
   )
 }
