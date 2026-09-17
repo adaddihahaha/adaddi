@@ -8,14 +8,12 @@ type SortOption = 'a-z' | 'new-old' | 'old-new'
 
 export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categories: BlogCategory[] }) {
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [sort, setSort] = useState<SortOption | ''>('')
+  const [sort, setSort] = useState<SortOption>('new-old')
 
   const visiblePosts = useMemo(() => {
     const filtered = selectedCategory === 'all'
       ? posts
       : posts.filter((post) => post.categories?.some((category) => category.title === selectedCategory))
-
-    if (!sort) return filtered
 
     return [...filtered].sort((a, b) => {
       if (sort === 'a-z') return a.title.localeCompare(b.title)
@@ -43,12 +41,11 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
           <select
             aria-label="Sort blog posts"
             value={sort}
-            onChange={(event) => setSort(event.target.value as SortOption | '')}
+            onChange={(event) => setSort(event.target.value as SortOption)}
           >
-            <option value="">Sort By</option>
-            <option value="a-z">A - Z</option>
-            <option value="new-old">New - Old</option>
-            <option value="old-new">Old - New</option>
+            <option value="new-old">Newest (Default)</option>
+            <option value="old-new">Oldest</option>
+            <option value="a-z">Alphabetical</option>
           </select>
         </div>
       </div>
