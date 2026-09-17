@@ -27,16 +27,6 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
   return (
     <>
       <div className="blog-category-filter" aria-label="Filter blog posts">
-        <div className="category-picker">
-          <select
-            aria-label="Filter by category"
-            value={selectedCategory}
-            onChange={(event) => chooseCategory(event.target.value)}
-          >
-            <option value="all">Select Category</option>
-            {categories.map((category) => <option key={category._id} value={category.title}>{category.title}</option>)}
-          </select>
-        </div>
         <div className="sort-control">
           <select
             aria-label="Sort blog posts"
@@ -46,6 +36,16 @@ export function BlogBrowser({ posts, categories }: { posts: BlogPost[]; categori
             <option value="new-old">Newest (Default)</option>
             <option value="old-new">Oldest</option>
             <option value="a-z">Alphabetical</option>
+          </select>
+        </div>
+        <div className="category-picker">
+          <select
+            aria-label="Filter by category"
+            value={selectedCategory}
+            onChange={(event) => chooseCategory(event.target.value)}
+          >
+            <option value="all">Select Category</option>
+            {categories.map((category) => <option key={category._id} value={category.title}>{category.title}</option>)}
           </select>
         </div>
       </div>
