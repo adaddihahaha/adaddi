@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://adaddi.io/sitemap.xml
