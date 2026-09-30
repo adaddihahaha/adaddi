@@ -29,7 +29,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ConsentBanner />
         <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8236858958634377"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
+          async
           crossOrigin="anonymous"
         />
         <Script
