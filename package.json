@@ -15,7 +15,8 @@
     "next-sanity": "^13.3.4",
     "react": "latest",
     "react-dom": "latest",
-    "sanity": "^6.17.0"
+    "sanity": "^6.17.0",
+    "styled-components": "^6.5.3"
   },
   "devDependencies": {
     "@types/node": "latest",
