@@ -19,6 +19,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <head>
         <meta name="google-adsense-account" content="ca-pub-8236858958634377" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8236858958634377"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body>
         <div className="site-shell">
@@ -27,12 +32,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SiteFooter />
         </div>
         <ConsentBanner />
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8236858958634377"
-          strategy="beforeInteractive"
-          async
-          crossOrigin="anonymous"
-        />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-S8FBB1PMVP"
           strategy="afterInteractive"
