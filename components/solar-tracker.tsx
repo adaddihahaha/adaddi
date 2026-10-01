@@ -1,28 +1,647 @@
-"use client";
+'use client'
 
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react'
 
-type Month = { rowId: string; before: string; beforeRate: string; after: string; afterRate: string; projected: string; projectedRate: string };
-type Series = "before" | "projected" | "after";
-type PickerWindow = Window & { showOpenFilePicker?: (options?: unknown) => Promise<FileSystemFileHandle[]>; showSaveFilePicker?: (options?: unknown) => Promise<FileSystemFileHandle> };
-const headers = ["Row ID", "System Cost", "Monthly Loan", "Total Months", "Before kWh", "Before Rate", "After kWh", "After Rate", "Est. No Solar kWh", "Est. No Solar Rate"];
-const money = (value: number) => `₱${Math.abs(value).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const blank = (rowId: string): Month => ({ rowId, before: "", beforeRate: "", after: "", afterRate: "", projected: "", projectedRate: "" });
-const parseCsvLine = (line: string) => { const result: string[] = []; let value = ""; let quoted = false; for (let i = 0; i < line.length; i += 1) { const character = line[i]; if (character === '"' && line[i + 1] === '"') { value += '"'; i += 1; } else if (character === '"') quoted = !quoted; else if (character === "," && !quoted) { result.push(value); value = ""; } else value += character; } result.push(value); return result; };
+type Month = {
+  rowId: string
+  before: string
+  beforeRate: string
+  after: string
+  afterRate: string
+  projected: string
+  projectedRate: string
+}
+type Series = 'before' | 'projected' | 'after'
+type PickerWindow = Window & {
+  showOpenFilePicker?: (options?: unknown) => Promise<FileSystemFileHandle[]>
+  showSaveFilePicker?: (options?: unknown) => Promise<FileSystemFileHandle>
+}
+const headers = [
+  'Row ID',
+  'System Cost',
+  'Monthly Loan',
+  'Total Months',
+  'Before kWh',
+  'Before Rate',
+  'After kWh',
+  'After Rate',
+  'Est. No Solar kWh',
+  'Est. No Solar Rate',
+]
+const money = (value: number) =>
+  `₱${Math.abs(value).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+const blank = (rowId: string): Month => ({
+  rowId,
+  before: '',
+  beforeRate: '',
+  after: '',
+  afterRate: '',
+  projected: '',
+  projectedRate: '',
+})
+const parseCsvLine = (line: string) => {
+  const result: string[] = []
+  let value = ''
+  let quoted = false
+  for (let i = 0; i < line.length; i += 1) {
+    const character = line[i]
+    if (character === '"' && line[i + 1] === '"') {
+      value += '"'
+      i += 1
+    } else if (character === '"') quoted = !quoted
+    else if (character === ',' && !quoted) {
+      result.push(value)
+      value = ''
+    } else value += character
+  }
+  result.push(value)
+  return result
+}
 
 export function SolarTracker() {
-  const [systemCost, setSystemCost] = useState("0"); const [loan, setLoan] = useState("0"); const [months, setMonths] = useState("0"); const [rows, setRows] = useState<Month[]>([]); const [calculated, setCalculated] = useState(false); const [fileHandle, setFileHandle] = useState<FileSystemFileHandle | null>(null); const [recordCount, setRecordCount] = useState(0); const [hovered, setHovered] = useState<{ index: number; series: Series } | null>(null);
-  const updateMonths = (value: string) => { const count = Math.min(120, Math.max(0, Number(value) || 0)); setMonths(String(count)); setRows(Array.from({ length: count }, (_, index) => rows[index] || blank(`month-${index + 1}`))); setCalculated(false); };
-  const update = (index: number, field: keyof Month, value: string) => setRows(rows.map((row, rowIndex) => rowIndex === index ? { ...row, [field]: value } : row));
-  const completeRows = useMemo(() => rows.map((row, index) => { const before = Number(row.before) * Number(row.beforeRate) || 0; const after = Number(row.after) * Number(row.afterRate) || 0; const projected = row.projected && row.projectedRate ? Number(row.projected) * Number(row.projectedRate) : before; return { row, index, before, after, projected: projected || 0, savings: (projected || 0) - after }; }).filter(({ row }) => row.before !== "" && row.beforeRate !== "" && row.after !== "" && row.afterRate !== ""), [rows]);
-  const chartRows = useMemo(() => rows.map((row, index) => { const before = Number(row.before) * Number(row.beforeRate) || 0; const after = Number(row.after) * Number(row.afterRate) || 0; const projected = row.projected && row.projectedRate ? Number(row.projected) * Number(row.projectedRate) : before; return { index, before, after, projected: projected || 0 }; }), [rows]);
-  const totals = completeRows.reduce((total, row) => ({ before: total.before + row.before, after: total.after + row.after, projected: total.projected + row.projected }), { before: 0, after: 0, projected: 0 }); const savings = totals.projected - totals.after; const totalMortgage = Number(loan || 0) * Number(months || 0); const interest = totalMortgage - Number(systemCost || 0); const averageSavings = completeRows.length ? savings / completeRows.length : 0; const netAfterLoan = savings - Number(loan || 0) * completeRows.length; const percentSaved = totals.projected ? savings / totals.projected * 100 : 0; const paybackMonths = averageSavings > 0 ? Number(systemCost || 0) / averageSavings : 0; const remainingCost = Math.max(0, totalMortgage - savings);
-  const chartWidth = Math.max(900, chartRows.length * 72); const chartHeight = 340; const padding = { top: 20, right: 24, bottom: 48, left: 82 }; const chartMaximum = Math.max(...chartRows.flatMap((row) => [row.before, row.projected, row.after]), 1); const chartX = (index: number) => padding.left + (chartRows.length > 1 ? index / (chartRows.length - 1) : .5) * (chartWidth - padding.left - padding.right); const chartY = (value: number) => padding.top + (1 - value / chartMaximum) * (chartHeight - padding.top - padding.bottom); const points = (series: Series) => chartRows.map((row) => `${chartX(row.index)},${chartY(row[series])}`).join(" ");
-  const quote = (value: string) => `"${value.replaceAll('"', '""')}"`; const saveRecord = async () => { if (!fileHandle) return; const lines = completeRows.map(({ row, index }) => [row.rowId || `month-${index + 1}`, systemCost, loan, months, row.before, row.beforeRate, row.after, row.afterRate, row.projected, row.projectedRate].map(quote).join(",")); const writable = await fileHandle.createWritable(); const existing = await (await fileHandle.getFile()).text(); await writable.write(`${existing || `${headers.join(",")}\n`}${lines.join("\n")}${lines.length ? "\n" : ""}`); await writable.close(); setRecordCount((count) => count + lines.length); };
-  const createRecord = async () => { try { const handle = await (window as PickerWindow).showSaveFilePicker?.({ suggestedName: "solar-savings.csv", types: [{ description: "CSV Files", accept: { "text/csv": [".csv"] } }] }); if (!handle) return; setFileHandle(handle); setRecordCount(0); const writable = await handle.createWritable(); await writable.write(`${headers.join(",")}\n`); await writable.close(); } catch (error) { if ((error as DOMException).name !== "AbortError") window.alert("Could not create the record file."); } };
-  const openRecord = async () => { try { const handles = await (window as PickerWindow).showOpenFilePicker?.({ types: [{ description: "CSV Files", accept: { "text/csv": [".csv"] } }], multiple: false }); const handle = handles?.[0]; if (!handle) return; const lines = (await (await handle.getFile()).text()).trim().split(/\r?\n/).filter(Boolean); const header = parseCsvLine(lines[0] || ""); const values = lines.slice(1).map(parseCsvLine); const old = header.includes("Before P/kWh"); const withIds = header[0] === "Row ID"; if (values[0]) { const first = values[0]; const offset = old ? 0 : withIds ? 1 : 0; const totalMonthsIndex = old ? 19 : header.indexOf("Total Months"); const count = Number(first[totalMonthsIndex]) || values.length; const loaded = Array.from({ length: count }, (_, index) => blank(`month-${index + 1}`)); values.forEach((item, index) => { const rowId = old ? `month-${((Number(item[1]?.slice(2, 4)) || 1) - 1) * 12 + (Number(item[1]?.slice(0, 2)) || index + 1)}` : withIds && /^month-\d+$/.test(item[0]) ? item[0] : `month-${index + 1}`; const rowIndex = Number(rowId.replace("month-", "")) - 1; const field = old ? { before: item[5], beforeRate: item[6], after: item[8], afterRate: item[9], projected: item[11], projectedRate: item[12] } : { before: item[offset + 3], beforeRate: item[offset + 4], after: item[offset + 5], afterRate: item[offset + 6], projected: item[offset + 7], projectedRate: item[offset + 8] }; if (rowIndex >= 0 && rowIndex < loaded.length) loaded[rowIndex] = { rowId, ...field }; }); setSystemCost(first[old ? 17 : header.indexOf("System Cost")] || "0"); setLoan(first[old ? 18 : header.indexOf("Monthly Loan")] || "0"); setMonths(String(count)); setRows(loaded); } setFileHandle(handle); setRecordCount(values.length); } catch (error) { if ((error as DOMException).name !== "AbortError") window.alert("Could not open the record file."); } };
-  const calculate = async () => { if (!completeRows.length) { window.alert("Enter at least one complete month first."); return; } setCalculated(true); await saveRecord(); };
-  const seriesLabels = { before: "Before", projected: "Est. No Solar", after: "After" };
-  const hoveredRow = hovered ? chartRows.find((row) => row.index === hovered.index) : null;
-  return <div className="tracker"><section className="calc-panel record-panel"><div className="panel-heading"><span className="eyebrow">Local file only</span><h2>Initialize record saving</h2><p>Create a CSV record on your device, or load one you already started. Nothing is sent to a database.</p></div><div className="record-actions">{fileHandle ? <button className="button button-outline" type="button" onClick={openRecord}>Change record</button> : <><button className="button" type="button" onClick={createRecord}>Create new record</button><button className="button button-outline" type="button" onClick={openRecord}>Load existing record</button></>}</div><p className={`record-status${fileHandle ? " is-connected" : " is-disconnected"}`}><span className="status-dot" aria-hidden="true" />{fileHandle ? `Connected: ${fileHandle.name} · ${recordCount} months saved` : "No record connected yet"}</p></section><section className="calc-panel"><div className="panel-heading"><span className="eyebrow">Scenario setup</span><h2>Solar system details</h2></div><div className="scenario-grid"><label>System cost (₱)<input type="number" onWheel={(e) => e.currentTarget.blur()} value={systemCost} onChange={(e) => setSystemCost(e.target.value)} /></label><label>Monthly loan (₱)<input type="number" onWheel={(e) => e.currentTarget.blur()} value={loan} onChange={(e) => setLoan(e.target.value)} /></label><label>Total months<input type="number" onWheel={(e) => e.currentTarget.blur()} value={months} min="0" max="120" onChange={(e) => updateMonths(e.target.value)} /></label></div><div className="mortgage-cards"><div><span className="eyebrow">Total mortgage</span><strong>{money(totalMortgage)}</strong></div><div><span className="eyebrow">Interest</span><strong>{money(interest)}</strong></div></div></section><section className="calc-panel"><div className="panel-heading"><span className="eyebrow">Monthly inputs</span><h2>Compare each bill</h2><p>Enter kWh and rate for before solar, after solar, and optional estimated no-solar use.</p></div><div className="table-wrap"><table className="input-table"><thead><tr><th>Month</th><th>Before kWh</th><th>₱/kWh</th><th>After kWh</th><th>₱/kWh</th><th>Est. No Solar kWh</th><th>₱/kWh</th></tr></thead><tbody>{rows.map((row, index) => <tr key={row.rowId}><td>Month {index + 1}</td>{(["before", "beforeRate", "after", "afterRate", "projected", "projectedRate"] as const).map((field) => <td key={field}><input aria-label={`${field} month ${index + 1}`} type="number" step="any" value={row[field]} onChange={(e) => update(index, field, e.target.value)} /></td>)}</tr>)}</tbody></table></div><button className="button" onClick={calculate}>Calculate savings {fileHandle ? "& save record" : "→"}</button></section>{calculated && <section className="results-card calc-panel"><div className="panel-heading"><span className="eyebrow">Savings summary</span><h2>What the numbers say</h2></div><div className="results-grid"><div className="metric-before"><span className="eyebrow">Total before solar</span><strong>{money(totals.before)}</strong><small>Old bill estimate</small></div><div className="metric-estimate"><span className="eyebrow">Est. No Solar</span><strong>{money(totals.projected)}</strong><small>Projected baseline</small></div><div className="metric-after"><span className="eyebrow">Total after solar</span><strong>{money(totals.after)}</strong><small>Actual solar bills</small></div><div className="metric-savings"><span className="eyebrow">Est. Total Savings</span><strong>{money(savings)}</strong><small>Without solar minus after</small></div><div className="metric-savings"><span className="eyebrow">Est. monthly savings</span><strong>{money(averageSavings)}</strong><small>Before loan payment</small></div><div className="metric-loan"><span className="eyebrow">Total loan paid</span><strong>{money(Number(loan || 0) * completeRows.length)}</strong><small>{money(Number(loan || 0))} per month</small></div><div className="metric-net"><span className="eyebrow">Net after loan</span><strong>{money(netAfterLoan)}</strong><small>Savings minus loan payments</small></div><div className="metric-savings"><span className="eyebrow">Overall % saved</span><strong>{percentSaved.toFixed(1)}%</strong><small>Saved vs projected bills</small></div><div className="payback-summary metric-estimate"><span className="eyebrow">Est. payback period</span><strong>{paybackMonths ? `${(paybackMonths / 12).toFixed(1)} yrs` : "—"}</strong><small>{paybackMonths ? `${Math.round(paybackMonths)} months` : "Enter positive savings"}</small></div><div className="remaining-summary metric-before"><span className="eyebrow">Total cost remaining</span><strong>{money(remainingCost)}</strong><small>Total mortgage minus savings</small></div></div><div className="summary-section"><h3>Monthly comparison</h3><div className="comparison-legend"><span><i className="bar-before" />Before solar</span><span><i className="bar-projected" />Est. No Solar</span><span><i className="bar-after" />After solar</span></div><div className="comparison-chart-scroll"><svg className="line-chart" viewBox={`0 0 ${chartWidth} ${chartHeight}`} width={chartWidth} height={chartHeight} role="img" aria-label="Monthly electricity cost comparison line graph"><line className="chart-axis" x1={padding.left} x2={padding.left} y1={padding.top} y2={chartHeight - padding.bottom} /><line className="chart-axis" x1={padding.left} x2={chartWidth - padding.right} y1={chartHeight - padding.bottom} y2={chartHeight - padding.bottom} />{[0, .25, .5, .75, 1].map((step) => { const y = chartY(chartMaximum * step); return <g key={step}><line className="chart-gridline" x1={padding.left} x2={chartWidth - padding.right} y1={y} y2={y} /><text className="chart-y-label" x={padding.left - 10} y={y + 4} textAnchor="end">{money(chartMaximum * step)}</text></g>; })}<polyline className="chart-line chart-before" points={points("before")} /><polyline className="chart-line chart-projected" points={points("projected")} /><polyline className="chart-line chart-after" points={points("after")} />{chartRows.map((row) => <g key={row.index}><circle className="chart-dot chart-before" cx={chartX(row.index)} cy={chartY(row.before)} r="4" /><circle className="chart-dot chart-projected" cx={chartX(row.index)} cy={chartY(row.projected)} r="4" /><circle className="chart-dot chart-after" cx={chartX(row.index)} cy={chartY(row.after)} r="4" /><circle className="chart-hit-area" cx={chartX(row.index)} cy={chartY(row.before)} r="11" onMouseEnter={() => setHovered({ index: row.index, series: "before" })} onMouseLeave={() => setHovered(null)} /><circle className="chart-hit-area" cx={chartX(row.index)} cy={chartY(row.projected)} r="11" onMouseEnter={() => setHovered({ index: row.index, series: "projected" })} onMouseLeave={() => setHovered(null)} /><circle className="chart-hit-area" cx={chartX(row.index)} cy={chartY(row.after)} r="11" onMouseEnter={() => setHovered({ index: row.index, series: "after" })} onMouseLeave={() => setHovered(null)} /><text className="chart-month-label" x={chartX(row.index)} y={chartHeight - 16} textAnchor="middle">M{row.index + 1}</text></g>)}{hovered && hoveredRow && <g className="chart-tooltip" transform={`translate(${Math.min(chartWidth - 170, Math.max(padding.left, chartX(hovered.index) + 12))} ${Math.max(padding.top, chartY(hoveredRow[hovered.series]) - 42)}`}><rect width="158" height="34" rx="4" /><text x="10" y="14">M{hovered.index + 1} · {seriesLabels[hovered.series]}</text><text x="10" y="28">{money(hoveredRow[hovered.series])}</text></g>}</svg></div></div><div className="summary-section"><h3>Month-by-month breakdown</h3><div className="table-wrap"><table><thead><tr><th>Month</th><th>Before solar</th><th>Est. No Solar</th><th>After solar</th><th>Savings</th><th>Net vs loan</th></tr></thead><tbody>{completeRows.map((row) => <tr key={row.row.rowId}><td>Month {row.index + 1}</td><td>{money(row.before)}</td><td>{money(row.projected)}</td><td>{money(row.after)}</td><td>{money(row.savings)}</td><td>{money(row.savings - Number(loan || 0))}</td></tr>)}</tbody></table></div></div>{fileHandle && <div className="record-summary"><span className="status-dot" aria-hidden="true" />This calculation is connected to <strong>{fileHandle.name}</strong> and saved locally.</div>}</section>}</div>;
+  const [systemCost, setSystemCost] = useState('0')
+  const [loan, setLoan] = useState('0')
+  const [months, setMonths] = useState('0')
+  const [rows, setRows] = useState<Month[]>([])
+  const [calculated, setCalculated] = useState(false)
+  const [fileHandle, setFileHandle] = useState<FileSystemFileHandle | null>(null)
+  const [recordCount, setRecordCount] = useState(0)
+  const [hovered, setHovered] = useState<{ index: number; series: Series } | null>(null)
+  const updateMonths = (value: string) => {
+    const count = Math.min(120, Math.max(0, Number(value) || 0))
+    setMonths(String(count))
+    setRows(Array.from({ length: count }, (_, index) => rows[index] || blank(`month-${index + 1}`)))
+    setCalculated(false)
+  }
+  const update = (index: number, field: keyof Month, value: string) =>
+    setRows(rows.map((row, rowIndex) => (rowIndex === index ? { ...row, [field]: value } : row)))
+  const completeRows = useMemo(
+    () =>
+      rows
+        .map((row, index) => {
+          const before = Number(row.before) * Number(row.beforeRate) || 0
+          const after = Number(row.after) * Number(row.afterRate) || 0
+          const projected =
+            row.projected && row.projectedRate
+              ? Number(row.projected) * Number(row.projectedRate)
+              : before
+          return {
+            row,
+            index,
+            before,
+            after,
+            projected: projected || 0,
+            savings: (projected || 0) - after,
+          }
+        })
+        .filter(
+          ({ row }) =>
+            row.before !== '' && row.beforeRate !== '' && row.after !== '' && row.afterRate !== '',
+        ),
+    [rows],
+  )
+  const chartRows = useMemo(
+    () =>
+      rows.map((row, index) => {
+        const before = Number(row.before) * Number(row.beforeRate) || 0
+        const after = Number(row.after) * Number(row.afterRate) || 0
+        const projected =
+          row.projected && row.projectedRate
+            ? Number(row.projected) * Number(row.projectedRate)
+            : before
+        return { index, before, after, projected: projected || 0 }
+      }),
+    [rows],
+  )
+  const totals = completeRows.reduce(
+    (total, row) => ({
+      before: total.before + row.before,
+      after: total.after + row.after,
+      projected: total.projected + row.projected,
+    }),
+    { before: 0, after: 0, projected: 0 },
+  )
+  const savings = totals.projected - totals.after
+  const totalMortgage = Number(loan || 0) * Number(months || 0)
+  const interest = totalMortgage - Number(systemCost || 0)
+  const averageSavings = completeRows.length ? savings / completeRows.length : 0
+  const netAfterLoan = savings - Number(loan || 0) * completeRows.length
+  const percentSaved = totals.projected ? (savings / totals.projected) * 100 : 0
+  const paybackMonths = averageSavings > 0 ? Number(systemCost || 0) / averageSavings : 0
+  const remainingCost = Math.max(0, totalMortgage - savings)
+  const chartWidth = Math.max(900, chartRows.length * 72)
+  const chartHeight = 340
+  const padding = { top: 20, right: 24, bottom: 48, left: 82 }
+  const chartMaximum = Math.max(
+    ...chartRows.flatMap((row) => [row.before, row.projected, row.after]),
+    1,
+  )
+  const chartX = (index: number) =>
+    padding.left +
+    (chartRows.length > 1 ? index / (chartRows.length - 1) : 0.5) *
+      (chartWidth - padding.left - padding.right)
+  const chartY = (value: number) =>
+    padding.top + (1 - value / chartMaximum) * (chartHeight - padding.top - padding.bottom)
+  const points = (series: Series) =>
+    chartRows.map((row) => `${chartX(row.index)},${chartY(row[series])}`).join(' ')
+  const quote = (value: string) => `"${value.replaceAll('"', '""')}"`
+  const saveRecord = async () => {
+    if (!fileHandle) return
+    const lines = completeRows.map(({ row, index }) =>
+      [
+        row.rowId || `month-${index + 1}`,
+        systemCost,
+        loan,
+        months,
+        row.before,
+        row.beforeRate,
+        row.after,
+        row.afterRate,
+        row.projected,
+        row.projectedRate,
+      ]
+        .map(quote)
+        .join(','),
+    )
+    const writable = await fileHandle.createWritable()
+    const existing = await (await fileHandle.getFile()).text()
+    await writable.write(
+      `${existing || `${headers.join(',')}\n`}${lines.join('\n')}${lines.length ? '\n' : ''}`,
+    )
+    await writable.close()
+    setRecordCount((count) => count + lines.length)
+  }
+  const createRecord = async () => {
+    try {
+      const handle = await (window as PickerWindow).showSaveFilePicker?.({
+        suggestedName: 'solar-savings.csv',
+        types: [{ description: 'CSV Files', accept: { 'text/csv': ['.csv'] } }],
+      })
+      if (!handle) return
+      setFileHandle(handle)
+      setRecordCount(0)
+      const writable = await handle.createWritable()
+      await writable.write(`${headers.join(',')}\n`)
+      await writable.close()
+    } catch (error) {
+      if ((error as DOMException).name !== 'AbortError')
+        window.alert('Could not create the record file.')
+    }
+  }
+  const openRecord = async () => {
+    try {
+      const handles = await (window as PickerWindow).showOpenFilePicker?.({
+        types: [{ description: 'CSV Files', accept: { 'text/csv': ['.csv'] } }],
+        multiple: false,
+      })
+      const handle = handles?.[0]
+      if (!handle) return
+      const lines = (await (await handle.getFile()).text()).trim().split(/\r?\n/).filter(Boolean)
+      const header = parseCsvLine(lines[0] || '')
+      const values = lines.slice(1).map(parseCsvLine)
+      const old = header.includes('Before P/kWh')
+      const withIds = header[0] === 'Row ID'
+      if (values[0]) {
+        const first = values[0]
+        const offset = old ? 0 : withIds ? 1 : 0
+        const totalMonthsIndex = old ? 19 : header.indexOf('Total Months')
+        const count = Number(first[totalMonthsIndex]) || values.length
+        const loaded = Array.from({ length: count }, (_, index) => blank(`month-${index + 1}`))
+        values.forEach((item, index) => {
+          const rowId = old
+            ? `month-${((Number(item[1]?.slice(2, 4)) || 1) - 1) * 12 + (Number(item[1]?.slice(0, 2)) || index + 1)}`
+            : withIds && /^month-\d+$/.test(item[0])
+              ? item[0]
+              : `month-${index + 1}`
+          const rowIndex = Number(rowId.replace('month-', '')) - 1
+          const field = old
+            ? {
+                before: item[5],
+                beforeRate: item[6],
+                after: item[8],
+                afterRate: item[9],
+                projected: item[11],
+                projectedRate: item[12],
+              }
+            : {
+                before: item[offset + 3],
+                beforeRate: item[offset + 4],
+                after: item[offset + 5],
+                afterRate: item[offset + 6],
+                projected: item[offset + 7],
+                projectedRate: item[offset + 8],
+              }
+          if (rowIndex >= 0 && rowIndex < loaded.length) loaded[rowIndex] = { rowId, ...field }
+        })
+        setSystemCost(first[old ? 17 : header.indexOf('System Cost')] || '0')
+        setLoan(first[old ? 18 : header.indexOf('Monthly Loan')] || '0')
+        setMonths(String(count))
+        setRows(loaded)
+      }
+      setFileHandle(handle)
+      setRecordCount(values.length)
+    } catch (error) {
+      if ((error as DOMException).name !== 'AbortError')
+        window.alert('Could not open the record file.')
+    }
+  }
+  const calculate = async () => {
+    if (!completeRows.length) {
+      window.alert('Enter at least one complete month first.')
+      return
+    }
+    setCalculated(true)
+    await saveRecord()
+  }
+  const seriesLabels = { before: 'Before', projected: 'Est. No Solar', after: 'After' }
+  const hoveredRow = hovered ? chartRows.find((row) => row.index === hovered.index) : null
+  return (
+    <div className="tracker mt-4.5 grid gap-4">
+      <section className="calc-panel record-panel border border-line bg-panel p-6.5 max-[700px]:px-4 max-[700px]:py-5">
+        <div className="panel-heading mb-5.5">
+          <span className="eyebrow">Local file only</span>
+          <h2 className="my-2">Initialize record saving</h2>
+          <p className="mb-0 text-[.85rem] text-muted">
+            Create a CSV record on your device, or load one you already started. Nothing is sent to
+            a database.
+          </p>
+        </div>
+        <div className="record-actions flex flex-wrap gap-2.5">
+          {fileHandle ? (
+            <button
+              className="cursor-pointer rounded-md border border-ink bg-transparent px-4.25 py-3 font-bold text-ink"
+              type="button"
+              onClick={openRecord}
+            >
+              Change record
+            </button>
+          ) : (
+            <>
+              <button
+                className="inline-block cursor-pointer rounded-md bg-orange px-4.25 py-3 font-bold text-white hover:brightness-95"
+                type="button"
+                onClick={createRecord}
+              >
+                Create new record
+              </button>
+              <button
+                className="cursor-pointer rounded-md border border-ink bg-transparent px-4.25 py-3 font-bold text-ink"
+                type="button"
+                onClick={openRecord}
+              >
+                Load existing record
+              </button>
+            </>
+          )}
+        </div>
+        <p
+          className={`record-status my-4 flex items-center gap-2 text-sm font-semibold ${fileHandle ? 'is-connected text-teal' : 'is-disconnected text-[#c4453d]'}`}
+        >
+          <span
+            className="status-dot size-2.25 shrink-0 rounded-full bg-[#c4453d]"
+            aria-hidden="true"
+          />
+          {fileHandle
+            ? `Connected: ${fileHandle.name} · ${recordCount} months saved`
+            : 'No record connected yet'}
+        </p>
+      </section>
+      <section className="calc-panel border border-line bg-panel p-6.5 max-[700px]:px-4 max-[700px]:py-5">
+        <div className="panel-heading mb-5.5">
+          <span className="eyebrow">Scenario setup</span>
+          <h2 className="my-2">Solar system details</h2>
+        </div>
+        <div className="scenario-grid mb-4.5 grid grid-cols-3 items-end gap-3.5 max-[700px]:grid-cols-2">
+          <label>
+            System cost (₱)
+            <input
+              type="number"
+              onWheel={(e) => e.currentTarget.blur()}
+              value={systemCost}
+              onChange={(e) => setSystemCost(e.target.value)}
+            />
+          </label>
+          <label>
+            Monthly loan (₱)
+            <input
+              type="number"
+              onWheel={(e) => e.currentTarget.blur()}
+              value={loan}
+              onChange={(e) => setLoan(e.target.value)}
+            />
+          </label>
+          <label>
+            Total months
+            <input
+              type="number"
+              onWheel={(e) => e.currentTarget.blur()}
+              value={months}
+              min="0"
+              max="120"
+              onChange={(e) => updateMonths(e.target.value)}
+            />
+          </label>
+        </div>
+        <div className="mortgage-cards mt-5 grid grid-cols-2 gap-3.5 border-t border-line pt-5 max-[700px]:grid-cols-1">
+          <div>
+            <span className="eyebrow">Total mortgage</span>
+            <strong>{money(totalMortgage)}</strong>
+          </div>
+          <div>
+            <span className="eyebrow">Interest</span>
+            <strong>{money(interest)}</strong>
+          </div>
+        </div>
+      </section>
+      <section className="calc-panel border border-line bg-panel p-6.5 max-[700px]:px-4 max-[700px]:py-5">
+        <div className="panel-heading mb-5.5">
+          <span className="eyebrow">Monthly inputs</span>
+          <h2 className="my-2">Compare each bill</h2>
+          <p className="mb-0 text-[.85rem] text-muted">
+            Enter kWh and rate for before solar, after solar, and optional estimated no-solar use.
+          </p>
+        </div>
+        <div className="table-wrap -mx-1 mb-5 overflow-x-auto">
+          <table className="input-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Before kWh</th>
+                <th>₱/kWh</th>
+                <th>After kWh</th>
+                <th>₱/kWh</th>
+                <th>Est. No Solar kWh</th>
+                <th>₱/kWh</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, index) => (
+                <tr key={row.rowId}>
+                  <td>Month {index + 1}</td>
+                  {(
+                    [
+                      'before',
+                      'beforeRate',
+                      'after',
+                      'afterRate',
+                      'projected',
+                      'projectedRate',
+                    ] as const
+                  ).map((field) => (
+                    <td key={field}>
+                      <input
+                        aria-label={`${field} month ${index + 1}`}
+                        type="number"
+                        step="any"
+                        value={row[field]}
+                        onChange={(e) => update(index, field, e.target.value)}
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <button
+          className="inline-block cursor-pointer rounded-md bg-orange px-4.25 py-3 font-bold text-white hover:brightness-95"
+          onClick={calculate}
+        >
+          Calculate savings {fileHandle ? '& save record' : '→'}
+        </button>
+      </section>
+      {calculated && (
+        <section className="results-card calc-panel border border-line bg-panel p-6.5 max-[700px]:p-4">
+          <div className="panel-heading mb-5.5 border-b border-line pb-4">
+            <span className="eyebrow">Savings summary</span>
+            <h2 className="my-2">What the numbers say</h2>
+          </div>
+          <div className="results-grid grid grid-cols-4 gap-2.5 max-[850px]:grid-cols-2 max-[420px]:grid-cols-1">
+            <div className="metric-before">
+              <span className="eyebrow">Total before solar</span>
+              <strong>{money(totals.before)}</strong>
+              <small>Old bill estimate</small>
+            </div>
+            <div className="metric-estimate">
+              <span className="eyebrow">Est. No Solar</span>
+              <strong>{money(totals.projected)}</strong>
+              <small>Projected baseline</small>
+            </div>
+            <div className="metric-after">
+              <span className="eyebrow">Total after solar</span>
+              <strong>{money(totals.after)}</strong>
+              <small>Actual solar bills</small>
+            </div>
+            <div className="metric-savings">
+              <span className="eyebrow">Est. Total Savings</span>
+              <strong>{money(savings)}</strong>
+              <small>Without solar minus after</small>
+            </div>
+            <div className="metric-savings">
+              <span className="eyebrow">Est. monthly savings</span>
+              <strong>{money(averageSavings)}</strong>
+              <small>Before loan payment</small>
+            </div>
+            <div className="metric-loan">
+              <span className="eyebrow">Total loan paid</span>
+              <strong>{money(Number(loan || 0) * completeRows.length)}</strong>
+              <small>{money(Number(loan || 0))} per month</small>
+            </div>
+            <div className="metric-net">
+              <span className="eyebrow">Net after loan</span>
+              <strong>{money(netAfterLoan)}</strong>
+              <small>Savings minus loan payments</small>
+            </div>
+            <div className="metric-savings">
+              <span className="eyebrow">Overall % saved</span>
+              <strong>{percentSaved.toFixed(1)}%</strong>
+              <small>Saved vs projected bills</small>
+            </div>
+            <div className="payback-summary metric-estimate">
+              <span className="eyebrow">Est. payback period</span>
+              <strong>{paybackMonths ? `${(paybackMonths / 12).toFixed(1)} yrs` : '—'}</strong>
+              <small>
+                {paybackMonths ? `${Math.round(paybackMonths)} months` : 'Enter positive savings'}
+              </small>
+            </div>
+            <div className="remaining-summary metric-before">
+              <span className="eyebrow">Total cost remaining</span>
+              <strong>{money(remainingCost)}</strong>
+              <small>Total mortgage minus savings</small>
+            </div>
+          </div>
+          <div className="summary-section">
+            <h3>Monthly comparison</h3>
+            <div className="comparison-legend mb-3.5 ml-20.5 flex flex-wrap gap-4.5 text-sm text-muted max-[700px]:ml-0">
+              <span>
+                <i className="bar-before" />
+                Before solar
+              </span>
+              <span>
+                <i className="bar-projected" />
+                Est. No Solar
+              </span>
+              <span>
+                <i className="bar-after" />
+                After solar
+              </span>
+            </div>
+            <div className="comparison-chart-scroll w-full overflow-x-auto pb-2.5">
+              <svg
+                className="line-chart"
+                viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+                width={chartWidth}
+                height={chartHeight}
+                role="img"
+                aria-label="Monthly electricity cost comparison line graph"
+              >
+                <line
+                  className="chart-axis"
+                  x1={padding.left}
+                  x2={padding.left}
+                  y1={padding.top}
+                  y2={chartHeight - padding.bottom}
+                />
+                <line
+                  className="chart-axis"
+                  x1={padding.left}
+                  x2={chartWidth - padding.right}
+                  y1={chartHeight - padding.bottom}
+                  y2={chartHeight - padding.bottom}
+                />
+                {[0, 0.25, 0.5, 0.75, 1].map((step) => {
+                  const y = chartY(chartMaximum * step)
+                  return (
+                    <g key={step}>
+                      <line
+                        className="chart-gridline"
+                        x1={padding.left}
+                        x2={chartWidth - padding.right}
+                        y1={y}
+                        y2={y}
+                      />
+                      <text
+                        className="chart-y-label"
+                        x={padding.left - 10}
+                        y={y + 4}
+                        textAnchor="end"
+                      >
+                        {money(chartMaximum * step)}
+                      </text>
+                    </g>
+                  )
+                })}
+                <polyline className="chart-line chart-before" points={points('before')} />
+                <polyline className="chart-line chart-projected" points={points('projected')} />
+                <polyline className="chart-line chart-after" points={points('after')} />
+                {chartRows.map((row) => (
+                  <g key={row.index}>
+                    <circle
+                      className="chart-dot chart-before"
+                      cx={chartX(row.index)}
+                      cy={chartY(row.before)}
+                      r="4"
+                    />
+                    <circle
+                      className="chart-dot chart-projected"
+                      cx={chartX(row.index)}
+                      cy={chartY(row.projected)}
+                      r="4"
+                    />
+                    <circle
+                      className="chart-dot chart-after"
+                      cx={chartX(row.index)}
+                      cy={chartY(row.after)}
+                      r="4"
+                    />
+                    <circle
+                      className="chart-hit-area"
+                      cx={chartX(row.index)}
+                      cy={chartY(row.before)}
+                      r="11"
+                      onMouseEnter={() => setHovered({ index: row.index, series: 'before' })}
+                      onMouseLeave={() => setHovered(null)}
+                    />
+                    <circle
+                      className="chart-hit-area"
+                      cx={chartX(row.index)}
+                      cy={chartY(row.projected)}
+                      r="11"
+                      onMouseEnter={() => setHovered({ index: row.index, series: 'projected' })}
+                      onMouseLeave={() => setHovered(null)}
+                    />
+                    <circle
+                      className="chart-hit-area"
+                      cx={chartX(row.index)}
+                      cy={chartY(row.after)}
+                      r="11"
+                      onMouseEnter={() => setHovered({ index: row.index, series: 'after' })}
+                      onMouseLeave={() => setHovered(null)}
+                    />
+                    <text
+                      className="chart-month-label"
+                      x={chartX(row.index)}
+                      y={chartHeight - 16}
+                      textAnchor="middle"
+                    >
+                      M{row.index + 1}
+                    </text>
+                  </g>
+                ))}
+                {hovered && hoveredRow && (
+                  <g
+                    className="chart-tooltip"
+                    transform={`translate(${Math.min(chartWidth - 170, Math.max(padding.left, chartX(hovered.index) + 12))} ${Math.max(padding.top, chartY(hoveredRow[hovered.series]) - 42)}`}
+                  >
+                    <rect width="158" height="34" rx="4" />
+                    <text x="10" y="14">
+                      M{hovered.index + 1} · {seriesLabels[hovered.series]}
+                    </text>
+                    <text x="10" y="28">
+                      {money(hoveredRow[hovered.series])}
+                    </text>
+                  </g>
+                )}
+              </svg>
+            </div>
+          </div>
+          <div className="summary-section">
+            <h3>Month-by-month breakdown</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th>Before solar</th>
+                    <th>Est. No Solar</th>
+                    <th>After solar</th>
+                    <th>Savings</th>
+                    <th>Net vs loan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {completeRows.map((row) => (
+                    <tr key={row.row.rowId}>
+                      <td>Month {row.index + 1}</td>
+                      <td>{money(row.before)}</td>
+                      <td>{money(row.projected)}</td>
+                      <td>{money(row.after)}</td>
+                      <td>{money(row.savings)}</td>
+                      <td>{money(row.savings - Number(loan || 0))}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {fileHandle && (
+            <div className="record-summary mt-6 flex items-center gap-2 border border-teal p-3.5 text-sm text-teal">
+              <span className="status-dot" aria-hidden="true" />
+              This calculation is connected to <strong>{fileHandle.name}</strong> and saved locally.
+            </div>
+          )}
+        </section>
+      )}
+    </div>
+  )
 }

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@portabletext/react": "^8.0.1",
@@ -19,9 +20,13 @@
     "styled-components": "^6.5.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "postcss": "^8.5.28",
+    "prettier": "^3.9.9",
+    "tailwindcss": "^4.3.3",
     "typescript": "latest"
   }
 }

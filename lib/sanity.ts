@@ -1,5 +1,5 @@
 import { createClient } from 'next-sanity'
-import imageUrlBuilder from '@sanity/image-url'
+import { createImageUrlBuilder } from '@sanity/image-url'
 
 export const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? 'dblakk45',
@@ -8,7 +8,7 @@ export const sanityClient = createClient({
   useCdn: true,
 })
 
-const builder = imageUrlBuilder(sanityClient)
+const builder = createImageUrlBuilder(sanityClient)
 
 export function urlFor(source: any) {
   return builder.image(source)
@@ -82,7 +82,11 @@ export async function getCategories() {
 }
 
 export async function getPost(slug: string) {
-  return sanityClient.fetch<BlogPostDetail | null>(postQuery, { slug }, { next: { revalidate: 60 } })
+  return sanityClient.fetch<BlogPostDetail | null>(
+    postQuery,
+    { slug },
+    { next: { revalidate: 60 } },
+  )
 }
 
 export function formatDate(value: string) {

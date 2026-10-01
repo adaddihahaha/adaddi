@@ -11,6 +11,10 @@ npm run dev
 
 Open http://localhost:3000.
 
+## Styling
+
+The app uses Tailwind CSS v4 with the PostCSS integration. Use utility classes in JSX for page and component layout; shared color and font utilities are defined in `app/globals.css` under `@theme`. That stylesheet also keeps the solar illustration, SVG chart details, and Portable Text descendant styles that need custom selectors. The root `styles.css` is a legacy reference file and is not imported by the Next.js app.
+
 ## Structure
 
 - `app/` contains App Router pages and shared styles.

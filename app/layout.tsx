@@ -1,10 +1,9 @@
-import type { Metadata } from 'next';
-import Script from 'next/script';
-import './globals.css';
-import './blog/blog.css';
-import { SiteHeader } from '@/components/site-header';
-import { SiteFooter } from '@/components/site-footer';
-import { ConsentBanner } from '@/components/consent-banner';
+import type { Metadata } from 'next'
+import Script from 'next/script'
+import './globals.css'
+import { SiteHeader } from '@/components/site-header'
+import { SiteFooter } from '@/components/site-footer'
+import { ConsentBanner } from '@/components/consent-banner'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://adaddi.io'),
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Practical tools to estimate bills, savings, and solar payback.',
   alternates: { canonical: '/' },
   icons: { icon: '/adaddi.png' },
-};
+}
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -26,7 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         ></script>
       </head>
       <body>
-        <div className="site-shell">
+        <div className="mx-auto max-w-290 px-8 pt-7 pb-6 max-[700px]:px-4.5 max-[700px]:py-5 max-[420px]:px-3.5">
           <SiteHeader />
           <main>{children}</main>
           <SiteFooter />
@@ -46,5 +45,5 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </Script>
       </body>
     </html>
-  );
+  )
 }
